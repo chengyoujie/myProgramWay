@@ -1,0 +1,18 @@
+{
+	"initial": [
+		"libs/modules/egret/egret.js",
+		"libs/modules/egret/egret.web.js",
+		"libs/modules/eui/eui.js",
+		"libs/modules/assetsmanager/assetsmanager.js",
+		"libs/modules/tween/tween.js",
+		"libs/modules/promise/promise.js",
+		"libs/modules/physics/physics.js",
+		"libs/modules/box2d/box2d.js"
+	],
+	"game": [
+		"bin-debug/b2.js",
+		"bin-debug/Main.js",
+		"bin-debug/Test.js",
+		"bin-debug/TestCar.js"
+	]
+}

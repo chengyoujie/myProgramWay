@@ -1,0 +1,20 @@
+{
+  "name": "test",
+  "version": "1.0.1",
+  "description": "==陈旭专用==",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "cyj"
+  ],
+  "author": "chengyoujie",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^2.0.8"
+  },
+  "dependencies": {
+    "chrome-debug-protocol": "^0.5.1"
+  }
+}

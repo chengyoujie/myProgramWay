@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>FREE VIDEO</title>
+    <script>
+        if (typeof window.require === "function") {
+            // 重命名 Electron 提供的 require
+            window.nodeRequire = window.require;
+            delete window.require;
+            delete window.exports;
+            delete window.module;
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="themes/icon.css">
+	<script type="text/javascript" src="script/jquery.min.js"></script>
+	<script type="text/javascript" src="script/jquery.easyui.min.js"></script>
+    <style type="text/css">
+      * { margin: 0; }
+      
+    </style>
+  </head>
+  <body>
+    <div id="login" class="easyui-dialog" title="登陸FreeVideo" data-options="iconCls:'icon-man',closable:false" style="width:400px;height: 280px; padding: 10px;">
+        <form action="do_login.php" id="loginform" method="POST">
+            <div style="margin-bottom: 20px;text-align: center;">
+                   <p>欢迎登陆FreeVideo</p>
+            </div>
+            <div style="margin-bottom: 20px">
+                <input class="easyui-textbox" id="loginName" name="name" style="width: 80%" data-options="label:'账号:',required:true"/>
+            </div>
+            <div style="margin-bottom: 20px">
+                <!-- <input class="easyui-textbox" name="password" style="width: 80%" data-options="label:'密码:',required:true" type="password"/> -->
+                <input class="easyui-passwordbox" name="password" prompt="Password" iconWidth="28" style="width:80%;height:34px;padding:10px"  data-options="label:'密码:',required:true">
+                <!-- <input class="easyui-textbox" name="winip" style="width: 0px" data-options="" type="hidden"/>-->
+                <input class="easyui-textbox" name="macid" id="macid" style="width: 0px;display: none;" data-options="" type="hidden"/> 
+            </div>
+            
+            <div style="margin-bottom: 20px;text-align: center">
+                <a href="javascript:void(0)" class='easyui-linkbutton' style="width: 120px" onclick="submitLogin()">登陆</a>
+                <a href="javascript:void(0)" class='easyui-linkbutton' style="width: 120px" onclick="gotoRegist()">注册</a>
+            </div>
+            <div style="margin-bottom: 0px;text-align: right;">
+                <a href="#">点击找回密码</a>
+            </div>
+        </form>
+    </div>
+    <div id="regist" class="easyui-dialog" title="注册FreeVideo" data-options="iconCls:'icon-man',closed:true,onClose:gotoLogin" style="width:400px;height: 380px; padding: 10px;">
+        <form action="do_regist.php" id="registform" method="POST">
+            <div style="margin-bottom: 20px;text-align: center;">
+                 <p style="color: #000">欢迎注册FreeVideo</p>
+             </div>
+             <div style="margin-bottom: 20px">
+                 <input class="easyui-textbox"  id="registName" name="name" style="width: 80%" data-options="label:'账号:',required:true"/>
+             </div>
+             <div style="margin-bottom: 20px">
+                 <input class="easyui-textbox" name="email" style="width: 80%" data-options="label:'邮箱:',required:true,validType:'email'"/>
+             </div>
+             <div style="margin-bottom: 20px">
+                 <input class="easyui-textbox" name="phone" style="width: 80%" data-options="label:'手机:',required:true"/>
+             </div>
+             <div style="margin-bottom: 20px">
+                 <input   class="easyui-passwordbox" prompt="Password" iconWidth="28" id="password1" name="password1" style="width: 80%" data-options="label:'密码:',required:true" />
+             </div>
+             <div style="margin-bottom: 20px">
+                 <input   class="easyui-passwordbox" prompt="Password" iconWidth="28" id="password2" name="password2" style="width: 80%" data-options="label:'确认密码:',required:true"/>
+                 <input class="easyui-textbox" name="macid" id="macidreg" style="width: 0px;display: none;" data-options="" type="hidden"/> 
+             </div>
+             <div style="margin-bottom: 0px;text-align: center">
+                 <a href="javascript:void(0)" class='easyui-linkbutton' style="width: 120px" onclick="onRegist()">注册</a>
+             </div>
+        </form>
+    </div>
+
+    <script  type="text/javascript">
+
+const os = nodeRequire('os');
+const crypto = nodeRequire('crypto');
+ function createLocalSign()
+ {
+	var macs = os.networkInterfaces();
+	var uid = [];
+	for(var devname in macs)
+	{
+		var iface = macs[devname];
+		for(var i=0; i<iface.length; i++)
+		{
+			var alias = iface[i];
+			if(alias.family == 'IPv4' && alias.address !== '127.0.01' && !alias.internal)
+			{
+				var adrs = alias.address;
+				uid.push(alias.mac);
+			}
+		}
+	}
+	uid.sort();
+	var uidstr = uid.join("|");
+	var md5 = crypto.createHash('md5');
+	md5.update(uidstr);
+	var sign = md5.digest('hex');
+	localStorage.setItem("sign", sign);
+ }
+ createLocalSign();
+        let macid = localStorage.getItem("sign");
+        let user = "";
+        $("#macid").attr("value",macid);
+        $("#macidreg").attr("value",macid);
+         $(function(){
+            $('#loginform').form({
+                onSubmit: function(){
+                    // do some check
+                    // return false to prevent submit;
+                    user = $("#loginName").val();
+                    return true;
+                },
+                success:function(data){
+                    var data = eval('(' + data + ')');
+                    if(data.state == 200)
+                    {
+                        gotoMain();
+                        $.messager.alert('提示', data.msg, 'info');
+                    }else{
+                        $.messager.alert('提示', data.msg, 'info');
+                    }
+                }
+            });
+
+            $('#registform').form({
+                onSubmit: function(){
+                    // do some check
+                    // return false to prevent submit;
+                    if($("#password1").val() != $("#password2").val())
+                    {
+                        $.messager.alert('提示', '两次密码不一致，请重新输入', 'info');
+                        return false;
+                    }
+                    user = $("#registName").val();
+                    return true;
+                },
+                success:function(data){
+                    var data = eval('(' + data + ')');
+                    if(data.state == 200)
+                    {
+                        $.messager.alert('提示', data.msg, 'info');
+                        gotoMain();
+                    }else{
+                        $.messager.alert('提示', data.msg, 'info');
+                    }
+                }
+            });
+        });
+
+        function gotoMain()
+        {
+            window.location = "index.php?user="+user+"&sign="+macid+"&time=121222222";
+        }
+        function submitLogin()
+        {
+            $("#loginform").form('submit');
+            // $('#loginform').form({
+            //     success:function(data){
+            //         $.messager.alert('Info', data, 'info');
+            //     }
+            // });
+        }
+
+        function gotoRegist()
+        {
+            $("#login").dialog("close");
+            $("#regist").dialog("open");
+        }
+        function gotoLogin()
+        {
+            $("#login").dialog("open");
+            $("#regist").dialog("close");
+        }
+
+        function onRegist()
+        {
+            $("#registform").form('submit');
+        }
+    </script>
+  </body>
+</html>

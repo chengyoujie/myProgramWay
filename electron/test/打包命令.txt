@@ -1,0 +1,4 @@
+electron-packager . 河南专技学习 --platform=win32 --arch=x64 --icon=icon.ico --out=./out --asar --app-version=0.0.1
+
+
+"build:win":"electron-packager . --platform=win32 --arch=all --version=1.4.4 --out ./package --overwrite --ignore=node_modules --ignore=src --ignore=logs --ignore=build --ignore=typings", "build:linux":"electron-packager . --platform=linux --arch=x64 --version=1.4.4 --out ./package --overwrite --ignore=node_modules --ignore=src --ignore=logs --ignore=build --ignore=typings"

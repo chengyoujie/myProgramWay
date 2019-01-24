@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>FREE VIDEO</title>
+    <script>
+        if (typeof window.require === "function") {
+            // 重命名 Electron 提供的 require
+            window.nodeRequire = window.require;
+            delete window.require;
+            delete window.exports;
+            delete window.module;
+        }
+    </script>
+    <style type="text/css">
+      * { margin: 0; }
+      #browser { 
+        height: 100vh; 
+        widows: 100vw;
+        flex: 2;
+        }
+
+        #nav{
+          width: 100vw;
+          height: 26px;
+          background-color: #aaa;
+          display:flex;
+          color:#ff0000;
+        }
+        #nav sel{
+          flex:2;
+          width:120vw;
+          height: 26px;
+          max-width: 60px;
+          text-align: center;
+          background-color: #fcfca0;
+          color: #272726;
+          margin-right: 10px;
+          float: right;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="nav">
+        选择播放源：<select id='sel'  name="sel" ></select> |<button id="btnPre">后退</button>|<button id="btnNext">前进</button>|<button id='openVideoWin'>播放器中打开</button>
+    </div>
+    <webview id="browser" src="https://www.iqiyi.com/" allowpopups  plugins></webview>
+    <script type="text/javascript" src="script/common.js"></script>
+    <script type="text/javascript" src="script/app.js"></script>
+  </body>
+</html>

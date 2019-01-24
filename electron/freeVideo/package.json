@@ -1,0 +1,20 @@
+{
+  "name": "freeVideo",
+  "version": "1.0.1",
+  "description": "资源下载",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "freeVideo"
+  ],
+  "author": "chengyoujie",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^2.0.8"
+  },
+  "dependencies": {
+    "chrome-debug-protocol": "^0.5.1"
+  }
+}

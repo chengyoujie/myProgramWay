@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Web Res Thife</title>
+    <script>
+        if (typeof window.require === "function") {
+            // 重命名 Electron 提供的 require
+            window.nodeRequire = window.require;
+            delete window.require;
+            delete window.exports;
+            delete window.module;
+        }
+    </script>
+    <style type="text/css">
+      * { margin: 0; }
+      #browser { 
+        height: 100vh; 
+        widows: 100vw;
+        }
+
+        #nav{
+          width: 100vw;
+          height: 30px;
+          background-color: #aaa;
+          display:flex;
+        }
+        #nav input {
+          flex:1;
+          width: 80vw;
+          height: 22px;
+          background-color: beige;
+          float: left;
+        }
+        #nav button{
+          flex:2;
+          width:20vw;
+          height: 30px;
+          max-width: 60px;
+          text-align: center;
+          background-color: #fcfca0;
+          color: #272726;
+          margin-right: 10px;
+          float: right;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="nav">
+        <input id="inputURL" value="http://www.baidu.com"/>
+        <button id='btnGo' >前往</button>
+        <button id='btnRecode' >记录</button>
+    </div>
+    <webview id="browser" src="http://www.baidu.com" allowpopups  plugins></webview>
+    <webview id="devetools"  ></webview>
+    <script type="text/javascript" src="script/common.js"></script>
+    <script type="text/javascript" src="script/app.js"></script>
+  </body>
+</html>
