@@ -1,0 +1,9 @@
+<toolsconfig 
+title="增量更新工具@cyj"
+appName="增量更新工具"
+
+version="1.0.2"
+
+versionconfig="file:////192.168.2.50/ftp/tool/remotdata/readfla/version.ver"
+
+/>

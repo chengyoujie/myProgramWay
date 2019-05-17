@@ -1,0 +1,9 @@
+<toolsconfig 
+title="FLA路径替换工具@cyj"
+appName="FLA路径替换工具"
+
+version="1.0.0"
+
+versionconfig="file:////192.168.2.50/ftp/tool/remotdata/readfla/version.ver"
+
+/>
