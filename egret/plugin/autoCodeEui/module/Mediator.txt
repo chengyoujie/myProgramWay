@@ -1,0 +1,53 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}Mediator extends ViewMediatorBase{
+    
+    private _module:${baseClsName}Module;
+
+    constructor(module:${baseClsName}Module)
+    {
+        super("${baseClsName}Mediator");
+        this._module = module;
+    }
+
+    public get view():${baseClsName}MainView{
+        return this._view as ${baseClsName}MainView;
+    }
+
+    protected initView(){
+        this._view = new ${baseClsName}MainView();
+    }
+
+    public dispose():void{
+        super.dispose();
+    }
+
+    protected createComplete(e:egret.Event)
+    {
+        let self = this;
+        super.createComplete(e);
+        new ResizeController(self.view, self.view.gameWindow.img_windowBg);
+        //TODO 创建完毕
+    }
+
+    public addEventListeners():void
+    {
+        let self = this;
+        let {gameWindow , panel} = self.view;
+        let {btn_back, btn_close} = gameWindow;
+        btn_back.clk(self.hidePanel, self);
+        btn_close.clk(self.hidePanel, self);
+    }
+
+    public showPanel(){
+        UIManager.ins.pop(this._view);
+    }
+
+    public hidePanel(){
+        UIManager.ins.remove(this._view);
+    }
+}

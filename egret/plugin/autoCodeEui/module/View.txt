@@ -1,0 +1,15 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}View extends EuiComponentBase {
+
+    ${varids}
+    
+    constructor(){
+        super();
+        this.euiSkinName = '${fileName}';
+    }
+}

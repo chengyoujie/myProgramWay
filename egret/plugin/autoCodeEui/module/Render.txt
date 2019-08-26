@@ -1,0 +1,22 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}Render extends ${baseClsName}RenderView {
+    
+    constructor() {
+        super();
+    }
+
+    protected euiSKinComplete(e: egret.Event): void {
+        super.euiSKinComplete(e);
+    }
+
+    /** 刷新 */
+    public dataChanged(): void {
+        super.dataChanged();
+        //TODO 数据更新操作
+    }
+}

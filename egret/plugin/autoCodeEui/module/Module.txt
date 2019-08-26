@@ -1,0 +1,52 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * 记得在 ModuleManager.initModule方法中添加
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}Module extends ModuleBase {
+
+    private _mediator:${baseClsName}Mediator;
+    private _service:${baseClsName}Service;
+    
+    constructor() {
+        super("${baseClsName}Module");
+    }
+
+    public startup():void
+    {
+        let self = this;
+        self._mediator = new ${baseClsName}Mediator(self);
+        self._service = new ${baseClsName}Service(self);
+        self.addEventListeners();
+    }
+
+    public shutDown():void
+    {
+        let self = this;
+        self.removeEventListeners();
+    }
+
+
+    protected addEventListeners()
+    {
+        let self = this;
+        cqobs.on(ModuleEventType.CLICK_MODULEID, self.handleOpen, self);
+    }
+    protected removeEventListeners():void
+    {
+        let self = this;
+        cqobs.off(ModuleEventType.CLICK_MODULEID, self.handleOpen, self);
+    }
+
+    private handleOpen(e:GameEvent)
+    {
+        let data = e.data;
+        if(data == ModuleID.${moduleID})
+        {
+            this._mediator.startup();
+            this._mediator.showPanel();
+        }
+    }
+}

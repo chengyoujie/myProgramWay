@@ -7,6 +7,8 @@
 |egret 白鹭项目相关的练习
 |----box2d  box2d相关的练习
 |--------testBox2d  第一个测试，实现小车能够在2d世界运行
+|----plugin  egret插件 根据eui生成代码插件
+|--------autoCodeEui   
 |
 |electron   Electron相关的练习
 |----freeVideo  可以免费观看各大视频网站的vip视频（算法使用别人的，仅供参考学习用）

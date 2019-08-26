@@ -1,0 +1,43 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}MainView extends ViewBase{
+    public gameWindow:Boom7Window;
+    private _panel:${baseClsName}View;
+    public NAME = "${baseClsName}MainView";
+
+    constructor()
+    {
+        super();
+    }
+
+    initView()
+    {
+        let self = this;
+        self.gameWindow = new Boom7Window();
+        self.addChild(self.gameWindow);
+        self._panel = new ${baseClsName}View();
+    }
+
+    public get panel(){
+        return this._panel;
+    }
+
+    protected initEui()
+    {
+        let self = this;
+        self.mapEuiComponent(self.gameWindow);
+        self.mapEuiComponent(self._panel);
+    }
+
+    protected createComplete(){
+        let self = this;
+        self.gameWindow.goup_content.addChild(self._panel);
+        super.createComplete();
+        //TODO 创建完毕操作
+    }
+
+}

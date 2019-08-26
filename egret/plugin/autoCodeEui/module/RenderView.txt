@@ -1,0 +1,22 @@
+/**
+ * AutoCodeEui => 自动生成的界面
+ * euiPath:${path} 
+ * made by ${auth}
+ * ${time} 
+ */
+class ${baseClsName}RenderView extends eui.ItemRenderer {
+    
+    ${varids}
+    
+    constructor() {
+        super();
+        let self = this;
+        self.on(eui.UIEvent.COMPLETE, self.euiSKinComplete, self);
+        self.skinName = '${fileName}';
+    }
+
+    protected euiSKinComplete(e: egret.Event): void {
+        let self = this;
+        self.off(eui.UIEvent.COMPLETE, self.euiSKinComplete, self);
+    }
+}

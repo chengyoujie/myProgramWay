@@ -1,0 +1,9 @@
+class ${baseClsName}Service extends ServiceBase {
+	private _module:${baseClsName}Module;
+
+	public constructor(module:${baseClsName}Module) {
+		super();
+		this._module = module;
+	}
+
+}
