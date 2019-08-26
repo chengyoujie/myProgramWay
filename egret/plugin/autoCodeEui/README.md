@@ -5,7 +5,7 @@
 
 1.在编辑器中打开当前需要导出的exml文件。
 
-2.使用快捷键 `ctr+shift+p` 打开输入框中输入AutoCodeEUI 按下回车即可
+2.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUI` 按下回车即可
 
 ## 模板文件中的变量
 > **auth** 当前使用者的名字，可在config中配置
@@ -28,7 +28,7 @@
 
 使用说明：
 
-1.使用快捷键 `ctr+shift+p` 打开输入框中输入AutoCodeEUI 按下回车即可打开配置文件
+1.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUI` 按下回车即可打开配置文件
 
 ## 配置说明
 
