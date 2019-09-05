@@ -1,0 +1,13 @@
+exml.e.d.ts
+configSetting.d.ts
+cross-sdk.d.ts
+assetsmanager.d.ts
+egret.d.ts
+eui.d.ts
+game.d.ts
+socket.d.ts
+tween.d.ts
+plt.d.ts
+qufu.d.ts
+wall-sdk.d.ts
+zlib.d.ts

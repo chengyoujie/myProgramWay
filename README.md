@@ -19,4 +19,6 @@
 |----down_english_sound  下载pc.shuren100.com的声音文件
 |----aigei               下载aigei.com的资源（需要本地chrome先登录aigei网）
 |
+|nodejs   NodeJs相关的练习
+|----findclsname  查找目录下的ts的类，并且混淆后拷贝到另一个目录下（也可用于程序压缩，混淆）
 ```
