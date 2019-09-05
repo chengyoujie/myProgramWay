@@ -18,17 +18,20 @@
 
 > **baseClsName** 当前exml文件 去掉Skin,EuiSkin后的名字
 
-> **moduleID** 根据当前 baseClsName 生成大写的常量值
+> **moduleID** 根据当前 `shortName` 生成大写的常量值
 
 > **varids** exml中所有的id变量声明字符串
 
+> **shortName** 当前的`baseClsName`去掉create配置中的keyword后的名字
+
+> **skinName** exml中class对应的值即皮肤的名字 如果没有则使用`baseClsName`
 
 # AutoCodeEUIConfig
 打开当前的配置 `app.config.json`
 
 使用说明：
 
-1.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUI` 按下回车即可打开配置文件
+1.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUIConfig` 按下回车即可打开配置文件
 
 ## 配置说明
 
@@ -60,6 +63,7 @@
 >> **fileType** 生成文件的文件类型
 
 
+
 示例：
 ```
 {
@@ -85,3 +89,9 @@
     }
 }
 ```
+# AutoCodeEUIModule
+打开当前模板文件
+
+使用说明：
+
+1.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUIModule` 按下回车即可打开模板文件

@@ -5,7 +5,7 @@
     "create":
     [
         {"keyword":"View", "usemodule":"1"},
-        {"keyword":"Panel", "usemodule":"1,4,5,6,7"},
+        {"keyword":"Panel", "usemodule":"1,4,5,6,7,8"},
         {"keyword":"Render", "usemodule":"2,3"}
     ],
     
@@ -17,6 +17,7 @@
         "4":{"id":4, "name":"MainView", "file":"MainView.txt", "outdir":"", "override":false, "fileType":"ts"},
         "5":{"id":5, "name":"Module", "file":"Module.txt", "outdir":"", "override":false, "fileType":"ts"},
         "6":{"id":6, "name":"Mediator", "file":"Mediator.txt", "outdir":"", "override":false, "fileType":"ts"},
-        "7":{"id":7, "name":"Service", "file":"Service.txt", "outdir":"", "override":false, "fileType":"ts"}
+        "7":{"id":7, "name":"Service", "file":"Service.txt", "outdir":"", "override":false, "fileType":"ts"},
+        "8":{"id":8, "name":"Model", "file":"Model.txt", "outdir":"model", "override":false, "fileType":"ts"}
     }
 }

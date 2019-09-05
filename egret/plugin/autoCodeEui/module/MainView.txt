@@ -1,13 +1,14 @@
 /**
- * AutoCodeEui => 自动生成的界面
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
  * euiPath:${path} 
  * made by ${auth}
- * ${time} 
+ * create on ${time} 
  */
-class ${baseClsName}MainView extends ViewBase{
+class ${shortName}MainView extends ViewBase{
     public gameWindow:Boom7Window;
-    private _panel:${baseClsName}View;
-    public NAME = "${baseClsName}MainView";
+    private _panel:${shortName}View;
+    public NAME = "${shortName}MainView";
 
     constructor()
     {
@@ -19,7 +20,7 @@ class ${baseClsName}MainView extends ViewBase{
         let self = this;
         self.gameWindow = new Boom7Window();
         self.addChild(self.gameWindow);
-        self._panel = new ${baseClsName}View();
+        self._panel = new ${shortName}View();
     }
 
     public get panel(){

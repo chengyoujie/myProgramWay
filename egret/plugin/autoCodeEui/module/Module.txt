@@ -1,24 +1,24 @@
 /**
- * AutoCodeEui => 自动生成的界面
- * 记得在 ModuleManager.initModule方法中添加
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
  * euiPath:${path} 
  * made by ${auth}
- * ${time} 
+ * create on ${time} 
  */
-class ${baseClsName}Module extends ModuleBase {
+class ${shortName}Module extends ModuleBase {
 
-    private _mediator:${baseClsName}Mediator;
-    private _service:${baseClsName}Service;
+    private _mediator:${shortName}Mediator;
+    private _service:${shortName}Service;
     
     constructor() {
-        super("${baseClsName}Module");
+        super("${shortName}Module");
     }
 
     public startup():void
     {
         let self = this;
-        self._mediator = new ${baseClsName}Mediator(self);
-        self._service = new ${baseClsName}Service(self);
+        self._mediator = new ${shortName}Mediator(self);
+        self._service = new ${shortName}Service(self);
         self.addEventListeners();
     }
 

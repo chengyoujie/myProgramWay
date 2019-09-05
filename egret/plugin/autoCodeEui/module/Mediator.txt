@@ -1,25 +1,26 @@
 /**
- * AutoCodeEui => 自动生成的界面
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
  * euiPath:${path} 
  * made by ${auth}
- * ${time} 
+ * create on ${time} 
  */
-class ${baseClsName}Mediator extends ViewMediatorBase{
+class ${shortName}Mediator extends ViewMediatorBase{
     
-    private _module:${baseClsName}Module;
+    private _module:${shortName}Module;
 
-    constructor(module:${baseClsName}Module)
+    constructor(module:${shortName}Module)
     {
-        super("${baseClsName}Mediator");
+        super("${shortName}Mediator");
         this._module = module;
     }
 
-    public get view():${baseClsName}MainView{
-        return this._view as ${baseClsName}MainView;
+    public get view():${shortName}MainView{
+        return this._view as ${shortName}MainView;
     }
 
     protected initView(){
-        this._view = new ${baseClsName}MainView();
+        this._view = new ${shortName}MainView();
     }
 
     public dispose():void{

@@ -1,10 +1,11 @@
 /**
- * AutoCodeEui => 自动生成的界面
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
  * euiPath:${path} 
  * made by ${auth}
- * ${time} 
+ * create on ${time} 
  */
-class ${baseClsName}RenderView extends eui.ItemRenderer {
+class ${shortName}RenderView extends eui.ItemRenderer {
     
     ${varids}
     
@@ -12,7 +13,7 @@ class ${baseClsName}RenderView extends eui.ItemRenderer {
         super();
         let self = this;
         self.on(eui.UIEvent.COMPLETE, self.euiSKinComplete, self);
-        self.skinName = '${fileName}';
+        self.skinName = '${skinName}';
     }
 
     protected euiSKinComplete(e: egret.Event): void {

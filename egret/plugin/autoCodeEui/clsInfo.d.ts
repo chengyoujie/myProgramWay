@@ -28,6 +28,8 @@ interface EUIInfo{
     fileName:string;
     /** 导出类的基本名字  一般用于生成对应功能的类 ` 如${baseClsName}View  ${baseClsName}Mediator` */
     baseClsName:string;
+    /**配置的class对应的skin名字 */
+    skinName:string;
 }
 
 ///////////项目配置

@@ -1,9 +1,22 @@
-class ${baseClsName}Service extends ServiceBase {
-	private _module:${baseClsName}Module;
+/**
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
+ * euiPath:${path} 
+ * made by ${auth}
+ * create on ${time} 
+ */
+class ${shortName}Service extends ServiceBase {
+	private _module:${shortName}Module;
 
-	public constructor(module:${baseClsName}Module) {
+	public constructor(module:${shortName}Module) {
 		super();
 		this._module = module;
+        this.startup();
+	}
+
+	protected addEventListeners(): void {
+		//let self = this;
+		//self.addNetEvent(MessageId.ID_XX,self.handleNetVO);
 	}
 
 }

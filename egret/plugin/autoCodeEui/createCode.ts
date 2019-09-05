@@ -14,11 +14,17 @@ var config:AppConfig;
 module.exports = {
     createCode,
     getConfigPath,
+    getModulePath,
 }
 
 function getConfigPath()
 {
     return configpath;
+}
+
+function getModulePath()
+{
+    return modulepath;
 }
 
 /**
@@ -41,7 +47,7 @@ function createCode(info:EUIInfo)
 	varsDic['path'] = path.relative(rootpath, info.path);
     varsDic['fileName'] = info.fileName;
     varsDic['baseClsName'] = info.baseClsName;
-    varsDic["moduleID"] = getModuleID(info.baseClsName);
+    varsDic['skinName'] = info.skinName;
     let varids = "";
     let ids = info.ids;
     for(let i=0; i<ids.length; i++)
@@ -57,9 +63,20 @@ function createCode(info:EUIInfo)
 	// saveFile(viewpath, viewcode);
     let create = findModule(config, info.fileName);
     let moduleIds = create.usemodule.split(",");
+    var keys = create.keyword.split("|");
+    for(let j=0; j<keys.length; j++)
+    {
+        if(info.baseClsName.indexOf(keys[j]) != -1)
+        {
+           varsDic["shortName"] = info.baseClsName.replace(keys[j], "");
+           break;
+        }
+    }
+    if(!varsDic["shortName"])varsDic["shortName"] = info.baseClsName;
+    varsDic["moduleID"] = getModuleID(varsDic["shortName"]);
     for(let i=0; i<moduleIds.length; i++)
     {
-        let mod = config.module[moduleIds[i]];
+        let mod:ModuleInfo = config.module[moduleIds[i]];
         if(!mod)
         {
             utils.log("app.config.json当前没有配置"+moduleIds[i]+"对应的配置")
@@ -105,10 +122,11 @@ function findModule(config:AppConfig, fileName:string)
     return config.create[config.defaultcreate];
 }
 
+
 /**根据ModuleInfo 生成对应的文件 */
 function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
 {
-	var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+info.baseClsName+modinfo.name+"."+modinfo.fileType);
+    var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
     if(!modinfo.override && fs.existsSync(outpath))
     {
         // utils.log("文件已存在不用生成")
@@ -117,6 +135,7 @@ function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
     }
     var viewcode = createCodeTxt(path.join(modulepath, modinfo.file), info, varsDic);
 	saveFile(outpath, viewcode);
+    utils.log("创建成功"+outpath)
 }
 
 /**保存文件， 如果文件夹不存在则会创建文件夹 */
@@ -124,7 +143,6 @@ function saveFile(path:string, data:string)
 {
 	checkOrCreateDir(path);
     fs.writeFileSync(path, data, "utf-8");
-	utils.log("创建成功："+path)
 }
 
 /**生成模板替换后的文本*/

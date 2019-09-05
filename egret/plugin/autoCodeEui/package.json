@@ -1,8 +1,8 @@
 {
 	"name": "autocodeeui",
-	"description": "A Simple Extension For Egret Wing.",
+	"description": "exml生成对应的代码模块【传奇来了项目组】",
 	"version": "1.0.0",
-	"publisher": "egret",
+	"publisher": "cyj",
 	"categories": [
 		"Other"
 	],
@@ -18,7 +18,8 @@
 	"license": "MIT",
 	"activationEvents": [
 		"onCommand:extension.autocodeeui",
-		"onCommand:extension.autocodeeuiconfig"
+		"onCommand:extension.autocodeeuiconfig",
+		"onCommand:extension.autocodeeuimodule"
 	],
 	"engines": {
 		"wing": "^3.0.4"
@@ -33,6 +34,10 @@
 			{
 				"command": "extension.autocodeeuiconfig",
 				"title": "AutoCodeEUIConfig"
+			},
+			{
+				"command": "extension.autocodeeuimodule",
+				"title": "AutoCodeEUIModule"
 			}
 		]
 	},

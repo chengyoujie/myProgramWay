@@ -1,6 +1,7 @@
 import * as wing from 'wing';
 import * as fs from 'fs';
 import * as path from 'path';
+var exec = require('child_process').exec;
 
 var code = require("./createCode")
 var utils = require("./utils")
@@ -14,6 +15,7 @@ export function activate(context: wing.ExtensionContext) {
 	console.log('根据Eui导出代码!');
 	wing.commands.registerCommand('extension.autocodeeui', euiOutCode);
 	wing.commands.registerCommand('extension.autocodeeuiconfig', euiOutCodeConfig);
+	wing.commands.registerCommand('extension.autocodeeuimodule', euiOpenCodeModule);
 	// wing.commands.registerCommand('extension.outcodeaddmenu', outCodeAddMenu);
 }
 
@@ -54,6 +56,16 @@ function euiOutCode() {
 		euiinfo.baseClsName = filearr[1];
 	else
 		euiinfo.baseClsName = filename;
+	
+	let skinNameReg = /\s+class=["'](\w+)["']\s+/gi;
+	let skinNameArr = skinNameReg.exec(content);
+	if(skinNameArr && skinNameArr.length>0)
+	{
+		euiinfo.skinName = skinNameArr[1];
+	}else{
+		euiinfo.skinName = euiinfo.baseClsName;
+	}
+	euiinfo.baseClsName = euiinfo.baseClsName;
 	let pathdirarr = path.normalize(pathinfo.dir).split(path.sep);
 	euiinfo.parentDir = pathdirarr[pathdirarr.length-1];
 	code.createCode(euiinfo);
@@ -73,13 +85,14 @@ function findIds(content:string):IdInfo[]{
 		if(temp && temp.length>0)
 		{
 			let clsDef = line.match(/<(.+?):(.+?) /);
-			if(clsDef.length<3)return;
+			if(!clsDef || clsDef.length<3)return;
 			let clsMod:string;
 			if(clsDef[1] == "e")
 			{
 				clsMod = uimodule;
 			}else{
 				clsMod = nss[clsDef[1]];
+				if(!clsMod)return;
 				clsMod = clsMod.substring(0, clsMod.length - 1);
 			}
 			let clsName = clsDef[2];
@@ -117,6 +130,12 @@ function euiOutCodeConfig()
 	doc.then((dic)=>{
 		wing.window.showTextDocument(dic);
 	})
+}
+
+function euiOpenCodeModule()
+{
+	// exec('explorer.exe /select, '+code.getModulePath());
+	exec('explorer.exe '+code.getModulePath());
 }
 
 // function outCodeAddMenu()
