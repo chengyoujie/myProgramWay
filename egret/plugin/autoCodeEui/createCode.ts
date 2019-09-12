@@ -49,13 +49,21 @@ function createCode(info:EUIInfo)
     varsDic['baseClsName'] = info.baseClsName;
     varsDic['skinName'] = info.skinName;
     let varids = "";
+    let interfaceIds = "";
     let ids = info.ids;
+    let createIdDic:{[id:number]:boolean} = {};
     for(let i=0; i<ids.length; i++)
     {
         let id = ids[i];
-        varids += "public "+id.name+":"+id.module+id.clsName+";\n\t";
+        let preAdd = "";
+        if(createIdDic[id.name])preAdd = "//";
+        varids += preAdd+"public "+id.name+":"+id.module+id.clsName+";\n\t";
+        interfaceIds += preAdd+id.name+"?:any;\n\t";
+        createIdDic[id.name] = true;
     }
     varsDic['varids'] = varids;
+    varsDic['interfaceIds'] = interfaceIds;
+
     //创建界面
 	// let modulepath = path.join(__dirname, "./../", "module");
     // var viewcode = createCodeTxt(path.join(modulepath, "View.txt"), info, varsDic);

@@ -5,7 +5,7 @@
  * made by ${auth}
  * create on ${time} 
  */
-class ${shortName}Render extends ${shortName}RenderView {
+class ${shortName}Render extends ${shortName}RenderViewUI {
     
     constructor() {
         super();
@@ -15,9 +15,21 @@ class ${shortName}Render extends ${shortName}RenderView {
         super.euiSKinComplete(e);
     }
 
+    /**将数据转换${shortName}RenderVO类型的数据  方便赋值给dataSource**/
+    protected encode(vo:any):${shortName}RenderVO{
+        //let self = this;
+        //let {_dataSource} = self;
+        //if(!_dataSource)_dataSource = self._dataSource = {};
+        ////TODO 处理数据转换
+        ////_dataSource.XXX = vo.XXX;
+        //return _dataSource;
+        return vo;
+    }
+
     /** 刷新 */
     public dataChanged(): void {
         super.dataChanged();
         //TODO 数据更新操作
+        this.dataSource = this.encode(this.data);
     }
 }

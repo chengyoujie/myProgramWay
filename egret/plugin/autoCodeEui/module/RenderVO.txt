@@ -1,0 +1,11 @@
+/**
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
+ * euiPath:${path} 
+ * made by ${auth}
+ * create on ${time} 
+ */
+interface ${shortName}RenderVO{
+    ${interfaceIds}
+	[propName: string]: any  //这里设置的是任意类型
+}

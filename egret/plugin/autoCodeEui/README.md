@@ -5,7 +5,7 @@
 
 1.在编辑器中打开当前需要导出的exml文件。
 
-2.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUI` 按下回车即可
+2.使用快捷键 `ctr+shift+p` 打开输入框中输入`AutoCodeEUI` 按下回车即可 【或者直接按`F12`即可】
 
 ## 模板文件中的变量
 > **auth** 当前使用者的名字，可在config中配置
@@ -21,6 +21,8 @@
 > **moduleID** 根据当前 `shortName` 生成大写的常量值
 
 > **varids** exml中所有的id变量声明字符串
+
+> **interfaceIds** exml中所有的id 接口声明字符串
 
 > **shortName** 当前的`baseClsName`去掉create配置中的keyword后的名字
 

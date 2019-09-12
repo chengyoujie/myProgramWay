@@ -7,7 +7,7 @@
  */
 class ${shortName}MainView extends ViewBase{
     public gameWindow:Boom7Window;
-    private _panel:${shortName}View;
+    private _panel:${shortName}ViewUI;
     public NAME = "${shortName}MainView";
 
     constructor()
@@ -20,7 +20,7 @@ class ${shortName}MainView extends ViewBase{
         let self = this;
         self.gameWindow = new Boom7Window();
         self.addChild(self.gameWindow);
-        self._panel = new ${shortName}View();
+        self._panel = new ${shortName}ViewUI();
     }
 
     public get panel(){

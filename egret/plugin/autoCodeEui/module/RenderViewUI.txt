@@ -1,0 +1,23 @@
+/**
+ * AutoCodeEui 生成的界面 
+ * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
+ * euiPath:${path} 
+ * made by ${auth}
+ * create on ${time} 
+ */
+class ${shortName}RenderViewUI extends BaseRender<${shortName}RenderVO> {
+    
+    ${varids}
+    
+    constructor() {
+        super();
+        let self = this;
+        self.on(eui.UIEvent.COMPLETE, self.euiSKinComplete, self);
+        self.skinName = '${skinName}';
+    }
+
+    protected euiSKinComplete(e: egret.Event): void {
+        let self = this;
+        self.off(eui.UIEvent.COMPLETE, self.euiSKinComplete, self);
+    }
+}
