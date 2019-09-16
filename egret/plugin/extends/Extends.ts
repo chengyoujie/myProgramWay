@@ -1,4 +1,5 @@
 namespace eui{
+    /**1.那些类需要增加dataSource属性 */
     export interface Component{dataSource:any;}
     export interface Label{dataSource:any;}
     export interface DataGroup{dataSource:any;}
@@ -8,6 +9,7 @@ namespace eui{
 
     const DATA_SOURCE_KEY = "$DATA_SOURCE_KEY";
 
+    /**2. 定义属性的默认类型 */
     //特殊处理类型
     createDataSourceDef(Component, getFlaseSetData);//Component 不设置属性，直接查找子对象的dataSource属性
     createDataSourceDef(List, getListSetData);//List 默认设置其setDataArr方法  数据为数组的时候 data instanceof Array
@@ -31,10 +33,12 @@ namespace eui{
     createDataSourceDef(ToggleButton, getBooleanSetData("selected"));//ToggleButton 默认设置其selected属性  当数据类型为： string等于为'true',number不等于0,boolean
     createDataSourceDef(ToggleSwitch, getBooleanSetData("selected"));//ToggleSwitch 默认设置其selected属性  当数据类型为： string等于为'true',number不等于0,boolean
 
+    /**返回False, 不做任何处理，由子类或子对象处理 */
     function getFlaseSetData(that, data)
     {
         return false;
     }
+    /**List中 数据类型为Array的时候， 调用setDataArr方法 */
     function getListSetData(that, data)
     {
         let type = typeof data;
@@ -48,6 +52,7 @@ namespace eui{
         }
         return false;
     }
+    /**DataGroup 中 数据类型为ArrayCollection 的时候设置 dataProvider属性 */
     function getDataGroupSetData(that, data)
     {
         let type = typeof data;
@@ -61,7 +66,7 @@ namespace eui{
         }
         return false;
     }
-
+    /**Rect的时候 当数据类型为字符串并且含有`,`的时候 分别表示 `"x,y,width,height"` */
     function getRectSetData(that, data)
     {
         let type = typeof data;
@@ -78,6 +83,7 @@ namespace eui{
         return false;
     }
 
+    /**获取字符串类型的数据 */
     function getCommonSetData(defaultProp:string, types:Array<string>=["string", "number", "boolean"])
     {
         return function(that, data){
@@ -91,7 +97,7 @@ namespace eui{
             }
         }
     }
-
+    /**获取布尔值类型的数据 */
     function getBooleanSetData(defaultProp:string)
     {
         return function(that, data)
@@ -114,7 +120,7 @@ namespace eui{
             }
         }
     }
-
+    /**获取数字类型的数据 */
     function getNumberSetData(defaultProp:string)
     {
         return function(that, data)
@@ -138,6 +144,11 @@ namespace eui{
         }
     }
 
+    /**
+     * 给某个类型 下创建一个dataSource的方法 
+     * @Type  数据的类型
+     * @setFun 设置对传过来的数据过滤， 筛掉需要的数据对其赋值
+     */
     function createDataSourceDef(Type:any, setFun:(that, data)=>boolean)
     {
         let buttonProp = Type.prototype;
@@ -162,7 +173,7 @@ namespace eui{
             get:function(){
                 return this[DATA_SOURCE_KEY];
             },
-            enumerable:true,
+            enumerable:false,
             configurable:true
         });
     }
