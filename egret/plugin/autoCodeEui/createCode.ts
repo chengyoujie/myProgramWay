@@ -135,13 +135,34 @@ function findModule(config:AppConfig, fileName:string)
 function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
 {
     var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
-    if(!modinfo.override && fs.existsSync(outpath))
+    let exists = fs.existsSync(outpath);
+    if(!modinfo.override && exists)
     {
         // utils.log("文件已存在不用生成")
         console.log("文件已存在不用生成");
         return;
     }
+    let areaDic={};
+
+    if(exists)//如果存在保护域则先记录保护域的内容
+    {
+        let reg = /\/\*+area(\d+)--start\*+\/([\s\S]*)\/\*+area\1--end\*+\//gi;
+        let oldContent = fs.readFileSync(outpath, 'utf-8');
+        let rect;
+        while(rect= reg.exec(oldContent))
+        {
+            areaDic[rect[1]] = rect[2];
+        }
+    }
     var viewcode = createCodeTxt(path.join(modulepath, modinfo.file), info, varsDic);
+    if(exists)//将保护域的内容在重新放到生成的文件中
+    {
+        for(let key in areaDic)
+        {
+            let reg = new RegExp("(\\/\\*+area"+key+"--start\\*+\\/)([\\s\\S]*)(\\/\\*+area"+key+"--end\\*+\\/)", "gi");
+            viewcode = viewcode.replace(reg, "$1"+areaDic[key]+"$3");
+        }
+    }
 	saveFile(outpath, viewcode);
     utils.log("创建成功"+outpath)
 }
