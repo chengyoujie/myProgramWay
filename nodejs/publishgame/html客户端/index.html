@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>版本发布</title>
+        <script src="js/jquery.js"></script>
+    </head>
+    <style>
+        body{
+            margin-top: 0px;
+            font:微软雅黑 12px;
+        }
+        div {
+            display: block;
+        }
+        #top{
+            margin-top: 20px;
+            height: 50;
+            position:fixed;
+            width: 100vw;
+        }
+        #log{
+            margin-top: 60px;
+            position:fixed;
+            width: 99vw;
+        }
+        #logmsg{
+            overflow:auto; 
+            height: 100px; 
+            width: 100%; 
+            border: 1px solid #999;
+        }
+        </style>
+    <body>
+        <div id="top">
+            <button id="btn_inner">发布国内内网</button>
+            <hr/>
+        </div>
+        <div id="log">
+            <button id="btn_clearlog">清除日志</button>
+            <pre id="logmsg">日志<br/></pre>
+        </div>
+        <script>
+            var ws = new WebSocket("ws://172.19.0.147:8089");
+            var connected = false;
+            ws.onopen = function(){
+                console.log("连接上了")
+                log("连接成功")
+                connected = true;
+            }
+            ws.onclose = function(){
+                console.log("关了")
+                log("连接关闭")
+                connected = false;
+            }
+            ws.onmessage = function(e){
+                var data = e.data;//JSON.parse(e.data);
+                console.log("收到数据：", data);
+                log(data)
+            }
+            $("#btn_inner").click(function(){
+                send({oper:"publish"})
+                var i = 0;
+                // setInterval(() => {
+                //     log(i+"  "+Math.random()*100)
+                //     i++;
+                //     console.log("run test " +i);
+                // }, (200));
+            });
+
+            $("#btn_clearlog").click(function(){
+                $("#logmsg").text("");
+            })
+
+            function send(data){
+                if(!data)return;
+                // if(connected == false)
+                // {
+                //     ws.onopen();
+                //     return;
+                // }
+                if(connected == false)
+                {
+                    log("连接失败，请重新刷新界面");
+                    return;
+                }
+                ws.send(JSON.stringify(data));
+            }
+
+            function log(msg)
+            {
+                $("#logmsg").append(msg+"\n")
+                // var node = document.createTextNode(msg+"\n");
+                // document.getElementById("logmsg").appendChild(node);
+                $("#logmsg").scrollTop($("#logmsg")[0].scrollHeight);
+                // $("#logmsg").scrollTop($("#logmsg").scrollHeight());
+            }
+            resize();
+            $(window).resize(resize);  
+            function resize()
+            {
+                $("#logmsg").height($(window).height() - 100);
+                $("#logmsg").width($(window).width() - 40);
+            }
+
+        </script>
+        
+    </body>
+</html>
