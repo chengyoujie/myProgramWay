@@ -14,6 +14,7 @@
 |----freeVideo  可以免费观看各大视频网站的vip视频（算法使用别人的，仅供参考学习用）
 |----test       河南专技  获取课堂问答的答案
 |----webResThife 获取当前浏览网站所有的资源，并下载到本地
+|----cqapp自己写的工具集合，目前只有打包工具
 |
 |python Python相关的练习
 |----down_english_sound  下载pc.shuren100.com的声音文件

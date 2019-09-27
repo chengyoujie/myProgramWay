@@ -1,0 +1,247 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>版本发布</title>
+        <!-- <script src="js/jquery.js"></script> -->
+        <script>window.$ = window.jQuery = require('./js/jquery.min.js');</script>
+        <script>window.easyui = require('./js/jquery.easyui.min.js');</script>
+        <link rel="stylesheet" type="text/css" href="./themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="./themes/icon.css">
+    </head>
+    <style>
+        body{
+            margin-top: 0px;
+            font:微软雅黑 12px;
+        }
+        div {
+            display: block;
+        }
+        #top{
+            margin-top: 20px;
+            height: 50;
+            position:fixed;
+            width: 100vw;
+        }
+        #top button {
+            margin-left: 40px;
+        }
+        #log{
+            margin-top: 110px;
+            position:fixed;
+            width: 99vw;
+        }
+        #logmsg{
+            overflow:auto; 
+            height: 100px; 
+            width: 100%; 
+            border: 1px solid #999;
+        }
+        </style>
+    <body>
+        <div id="top">
+            <table>
+              <tr>
+                <td rowspan="2" style="text-align: center" width='150px'>
+                    选择版本<select id="projectSel" class="easyui-combobox"  style="width:120px;">
+                        <option value="inner_game">国内内网版本</option>
+                        <option value="inner_mingame">小程序内网版本</option>
+                      </select>
+                </td>
+                <td width="20px"></td>
+                <td>
+                    程序目录：<input id="codepath" class="easyui-textbox" data-options="" style="width:250px"><input id="seleCode" type=file webkitdirectory hidden='true'>
+                    <!-- 程序目录： <input id="codepath"  class="easyui-filebox" type=file webkitdirectory style="width:250px"><br/> -->
+                </td>
+                <td rowspan="2" style="text-align: center" width='150px'>
+                    <a id="btn_publish" class="easyui-linkbutton" style="width: 120px;height:45px">发布</a>
+                </td>
+              </tr>
+              <tr>
+                <td width="20px"></td>
+                <td>
+                    输出目录：<input id="pubpath" class="easyui-textbox" data-options="" style="width:250px"><input id="selePub" type=file webkitdirectory hidden='true'>
+                </td>
+                <td width="20px"></td>
+              </tr>
+            </table>
+            <hr/>
+        </div>
+        <div id="log">
+            <button id="btn_clearlog">清除日志</button>
+            <pre id="logmsg"></pre>
+        </div>
+        <div id="login" class="easyui-window" title="登录" style="width:320px;height:200px;" data-options="iconCls:'icon-man',modal:true,minimizable:false,closable:false">
+          <form style="padding:10px 20px 10px 40px;text-align: center">
+            <p>请输入使用者的名字</p>
+            <p><input id='username' type="text"></p>
+            <div style="padding:5px;text-align:center;">
+              <a id='loginbtn' href="#" class="easyui-linkbutton">登录</a>
+            </div>
+          </form>
+        </div>
+        <script>
+            var publish = require("./publish.js");
+            var fs = require("fs");
+            var path = require("path")
+            const ipc = require('electron').ipcRenderer;
+            var configpath = path.join(__dirname, "app.config");
+            var configdata;
+            var projectType;
+            publish.setLogFun(log);
+            //初始化时检测是否显示登录界面
+            window.onload = function()
+            {
+              log("系统初始化成功")
+              if(!fs.existsSync(configpath))
+              {
+                  configdata = {};
+                  log("<font color='#ff0000'>请先登录系统</font>")
+                  $("#login").window('open'); 
+              }else{
+                  let data = fs.readFileSync(configpath, {encoding:"utf-8"});
+                  configdata = JSON.parse(data);
+                  if(!configdata.user)
+                  {
+                    log("<font color='#ff0000'>请先登录系统</font>")
+                    $("#login").window('open');
+                  }else{
+                    log("<font color='#0000ff'>"+configdata.user+"</font>登录成功")
+                    $("#login").window('close'); 
+                  }
+              }
+              
+              //选择项目
+              $("#projectSel").combobox(
+                {
+                  onSelect:function(param){
+                    projectChange(param)
+                  }
+                }
+              );
+              projectChange();
+            }
+            //选择代码路径
+            $('#codepath').textbox({
+              icons: [{
+                  iconCls:'icon-search',
+                handler: function(e){
+                    $('#seleCode').trigger("click");
+                }
+              }]
+          })
+          $("#seleCode").change((e)=>{
+            let files = e.currentTarget.files;
+            if(!files || files.length==0)return;
+            let codepath = files[0].path;
+            $('#codepath').textbox('setValue', codepath);
+            configdata.project[projectType].codepath = codepath;
+            saveConfig();
+          })
+
+          //选择发布路径
+          $('#pubpath').textbox({
+              icons: [{
+                  iconCls:'icon-search',
+                handler: function(e){
+                    $('#selePub').trigger("click");
+                }
+              }]
+          })
+          $("#selePub").change((e)=>{
+            let files = e.currentTarget.files;
+            if(!files || files.length==0)return;
+            let pubpath = files[0].path;
+            $('#pubpath').textbox('setValue', pubpath);
+            configdata.project[projectType].pubpath = pubpath;
+            saveConfig();
+          })
+          //项目发生改变
+          function projectChange(param)
+          {
+            let selvale = param?param.value:$("#projectSel").find("option:selected").val();
+            if(selvale == projectType)return;
+            let selename = param?param.text:$("#projectSel").find("option:selected").text();
+            log("当前选中<font color='#0000ff'>"+selename+"</font>");
+            projectType = selvale;
+            if(!configdata)configdata = {};
+            if(!configdata.project)configdata.project = {};
+            if(!configdata.project[projectType])configdata.project[projectType] = {};
+            let codepath = configdata.project[projectType].codepath || "";
+            let pubpath = configdata.project[projectType].pubpath || "";
+            $('#codepath').textbox('setValue', codepath);
+            $('#pubpath').textbox('setValue', pubpath);
+          }
+          //接收主Render发过来的信息
+          ipc.on("msg", (event, msg)=>{
+            let data = JSON.parse(msg);
+            switch(data.type)
+            {
+              case "login":
+                if(configdata)
+                  $("#username").val(configdata.user);
+                $("#login").window('open');
+              break;
+            }
+          })
+
+        
+        $("#loginbtn").click(function(){
+          let uname = $("#username").val();
+          if(!uname)
+          {
+            $.messager.alert('提示','名字不能为空!','info');
+            return;
+          } 
+          configdata.user = uname;
+          $("#login").window('close'); 
+          saveConfig();
+          log("<font color='#0000ff'>"+configdata.user+"</font>登录成功")
+        })
+
+        function saveConfig()
+        {
+          if(!configdata)configdata = {};
+          fs.writeFileSync(configpath, JSON.stringify(configdata), "utf-8");
+        }
+
+
+        $("#btn_publish").click(function(){
+          if(!projectType)
+          {
+            $.messager.alert('提示','当前没有选择项目，请重新选择!','info');
+            return;
+          }
+          send({oper:"publish", type:projectType})
+        });
+            
+            // $("#btn_mingame").click(function(){
+            //     send({oper:"publish", type:"mingame"})
+            // });
+
+            $("#btn_clearlog").click(function(){
+                $("#logmsg").text("");
+            })
+
+            function send(data){
+                if(!data)return;
+                publish.run(configdata, data);
+            }
+
+            function log(msg)
+            {
+                $("#logmsg").append(msg+"\n")
+                $("#logmsg").scrollTop($("#logmsg")[0].scrollHeight);
+            }
+            resize();
+            $(window).resize(resize);  
+            function resize()
+            {
+                $("#logmsg").height($(window).height() - 150);
+                $("#logmsg").width($(window).width() - 20);
+            }
+
+        </script>
+        
+    </body>
+</html>
