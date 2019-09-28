@@ -5,7 +5,7 @@
  * made by ${auth}
  * create on ${time} 
  */
-class ${shortName}Model{
+class ${shortName}Model {
 
     private static _instance: ${shortName}Model;
     
@@ -16,5 +16,12 @@ class ${shortName}Model{
 		}
 		return self._instance;
 	}
+
+	public constructor() {
+		super();
+		netRsp.on(this);
+	}
+
+	//监听服务器事件使用 private n_协议号(vo:S_XXXX):void{}
 
 }

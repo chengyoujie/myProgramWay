@@ -1,6 +1,7 @@
 var fs = require("fs")
 var path = require("path")
 var os = require("os")
+var iconv = require("iconv-lite");
 
 var wingapi = require("wing");
 
@@ -41,7 +42,7 @@ function createCode(info:EUIInfo)
     config = JSON.parse(configtxt);
     moduleCodePath = config.moduleCodePath;
     let varsDic = {};
-    varsDic["auth"] = config.auth || os.userInfo().username;
+    varsDic["auth"] = config.auth  || getHostName() || os.userInfo().username;
     let date = new Date();
     varsDic["time"] = date.getFullYear()+"-"+(date.getMonth()+1) + "-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
 	varsDic['path'] = path.relative(rootpath, info.path);
@@ -94,6 +95,16 @@ function createCode(info:EUIInfo)
     }
 }
 
+/**获取当前计算机名 */
+function getHostName()
+{
+    
+    let name = os.hostname();
+    let buff = new Buffer(name, "binary");
+    name = iconv.decode(buff, "gbk");
+    return name;
+}
+
 /**根据module名字生成ModuleID  生成规则 moduleName原始字符中大写前加上_并把所有字符转成大写 */
 function getModuleID(moduleName:string)
 {
@@ -134,7 +145,14 @@ function findModule(config:AppConfig, fileName:string)
 /**根据ModuleInfo 生成对应的文件 */
 function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
 {
-    var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    // var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    let keyReg = /\[(.*?)\]/gi;
+    let keyArr = keyReg.exec(modinfo.outdir);
+    let outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    if(keyArr)
+    {
+        outpath = path.join(rootpath, modinfo.outdir.replace(keyArr[0], keyArr[1]).trim(), varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    }
     let exists = fs.existsSync(outpath);
     if(!modinfo.override && exists)
     {

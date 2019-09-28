@@ -40,18 +40,22 @@
 				"title": "AutoCodeEUIModule"
 			}
 		],
-		"keybindings": [{
-			"command": "extension.autocodeeui",
-			"key": "f12",
-			"mac": "f12"
-    	}]
+		"keybindings": [
+			{
+				"command": "extension.autocodeeui",
+				"key": "f12",
+				"mac": "f12"
+			}
+		]
 	},
 	"scripts": {
 		"wing:prepublish": "node ./node_modules/egretwing/bin/compile",
 		"compile": "node ./node_modules/egretwing/bin/compile -watch -p ./",
 		"postinstall": "node ./node_modules/egretwing/bin/install"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"iconv-lite": "^0.5.0"
+	},
 	"devDependencies": {
 		"egretwing": "^3.0.4",
 		"typescript": "^1.7.5"

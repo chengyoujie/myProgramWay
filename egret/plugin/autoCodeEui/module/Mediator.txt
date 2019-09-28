@@ -39,9 +39,10 @@ class ${shortName}Mediator extends ViewMediatorBase{
     {
         let self = this;
         let {gameWindow , panel} = self.view;
-        let {btn_back, btn_close} = gameWindow;
+        let {btn_back, btn_close, btn_explain} = gameWindow;
         btn_back.clk(self.hidePanel, self);
         btn_close.clk(self.hidePanel, self);
+        btn_explain.clk(self.getExplain, self);
     }
 
     public showPanel(){
@@ -50,5 +51,10 @@ class ${shortName}Mediator extends ViewMediatorBase{
 
     public hidePanel(){
         UIManager.ins.remove(this._view);
+    }
+
+    /**说明Tips */
+    public getExplain(): void {
+        UIManager.ins.showRuledesc(ModuleID.${moduleID}, 0);
     }
 }

@@ -5,7 +5,7 @@
  * made by ${auth}
  * create on ${time} 
  */
-class ${shortName}ViewUI extends EuiComponentBase {
+class ${shortName}UI extends EuiComponentBase {
 
     ${varids}
     

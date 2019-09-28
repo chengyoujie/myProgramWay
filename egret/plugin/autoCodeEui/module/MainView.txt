@@ -7,7 +7,7 @@
  */
 class ${shortName}MainView extends ViewBase{
     public gameWindow:Boom7Window;
-    private _panel:${shortName}ViewUI;
+    private _panel:${shortName}UI;
     public NAME = "${shortName}MainView";
 
     constructor()

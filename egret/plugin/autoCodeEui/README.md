@@ -71,7 +71,7 @@
 
 >> **file** 模板的文件名
 
->> **outdir** 导出在对应模块文件下的的文件夹名 
+>> **outdir** 导出在对应模块文件下的的文件夹名  如果是[xxxx/xxx]则表示导出在相对跟路径的文件夹 
 
 >> **override** 是否覆盖， 生成的文件如果不存在则新建，如果存在则override=true时覆盖，override=false时不覆盖
 
@@ -83,24 +83,26 @@
 ```
 {
     "auth":"",
-    "defaultcreate":0,
+    "defaultcreate":1,
     "moduleCodePath":"src/game/module/",
     "create":
     [
+        {"keyword":"MainPanel", "usemodule":"1,4,5,6,8"},
         {"keyword":"View", "usemodule":"1"},
-        {"keyword":"Panel", "usemodule":"1,4,5,6,7"},
+        {"keyword":"Panel", "usemodule":"1,10"},
         {"keyword":"Render", "usemodule":"2,3"}
     ],
     
     "module":
     {
-        "1":{"id":1, "name":"View", "file":"View.txt", "outdir":"view", "override":true, "fileType":"ts"},
-        "2":{"id":2, "name":"RenderView", "file":"RenderView.txt", "outdir":"view", "override":true, "fileType":"ts"},
-        "3":{"id":3, "name":"Render", "file":"Render.txt", "outdir":"", "override":false, "fileType":"ts"},
-        "4":{"id":4, "name":"MainView", "file":"MainView.txt", "outdir":"", "override":false, "fileType":"ts"},
-        "5":{"id":5, "name":"Module", "file":"Module.txt", "outdir":"", "override":false, "fileType":"ts"},
-        "6":{"id":6, "name":"Mediator", "file":"Mediator.txt", "outdir":"", "override":false, "fileType":"ts"},
-        "7":{"id":7, "name":"Service", "file":"Service.txt", "outdir":"", "override":false, "fileType":"ts"}
+        "1":{"id":1,    "name":"UI",        "file":"UI.txt",            "outdir":"[src/game/ui]",          "override":true, "fileType":"ts"},
+        "2":{"id":2,    "name":"RenderUI",  "file":"RenderUI.txt",      "outdir":"[src/game/ui]",          "override":true, "fileType":"ts"},
+        "3":{"id":3,    "name":"Render",    "file":"Render.txt",        "outdir":"view",                    "override":false, "fileType":"ts"},
+        "4":{"id":4,    "name":"MainView",  "file":"MainView.txt",      "outdir":"view",                    "override":false, "fileType":"ts"},
+        "5":{"id":5,    "name":"Module",    "file":"Module.txt",        "outdir":"",                        "override":false, "fileType":"ts"},
+        "6":{"id":6,    "name":"Mediator",  "file":"Mediator.txt",      "outdir":"",                        "override":false, "fileType":"ts"},
+        "8":{"id":8,    "name":"Model",     "file":"Model.txt",         "outdir":"model",                   "override":false, "fileType":"ts"},
+        "10":{"id":10,  "name":"Panel",     "file":"Panel.txt",         "outdir":"view",                    "override":false, "fileType":"ts"}
     }
 }
 ```
