@@ -26,6 +26,8 @@
 
 > **shortName** 当前的`baseClsName`去掉create配置中的keyword后的名字
 
+> **shortName**  `shortName`首字母小写
+
 > **skinName** exml中class对应的值即皮肤的名字 如果没有则使用`baseClsName`
 
 ## 模板中使用保护域
@@ -77,6 +79,7 @@
 
 >> **fileType** 生成文件的文件类型
 
+>> **checkfloder** 是否检查文件夹， 如果文件夹存在则不生成该模板文件， 如果不存在则生成
 
 
 示例：
