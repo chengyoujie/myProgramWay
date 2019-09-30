@@ -92,10 +92,14 @@ function findIds(content:string):IdInfo[]{
 				clsMod = uimodule;
 			}else{
 				clsMod = nss[clsDef[1]];
-				if(!clsMod)return;
-				clsMod = clsMod.substring(0, clsMod.length - 1);
+				if(!clsMod){ 
+					clsMod = (clsDef[1] || "")+ ".";
+				}else{
+					clsMod = clsMod.substring(0, clsMod.length - 1);
+				}
 			}
 			let clsName = clsDef[2];
+			if(clsName == "Config" && clsMod == "w.")return;//忽略w:Config 的配置
 			let id = temp[0].replace(' id=', "").replace('"', '').replace('"', '');
 			ids.push({name:id, module:clsMod, clsName:clsName});
 		}

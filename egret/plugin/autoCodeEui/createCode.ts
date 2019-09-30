@@ -58,8 +58,8 @@ function createCode(info:EUIInfo)
         let id = ids[i];
         let preAdd = "";
         if(createIdDic[id.name])preAdd = "//";
-        varids += preAdd+"public "+id.name+":"+id.module+id.clsName+";\n\t";
-        interfaceIds += preAdd+id.name+"?:any;\n\t";
+        varids += preAdd+"public "+id.name+":"+id.module+id.clsName+";\n\t\t";
+        interfaceIds += preAdd+id.name+"?:any;\n\t\t";
         createIdDic[id.name] = true;
     }
     varsDic['varids'] = varids;
@@ -71,6 +71,33 @@ function createCode(info:EUIInfo)
 	// var viewpath = path.join(rootpath,"src/game/module/"+info.parentDir+"/"+info.baseClsName+"View.ts");
 	// saveFile(viewpath, viewcode);
     let create = findModule(config, info.fileName);
+    createCreate(create, info, varsDic);
+    // let moduleIds = create.usemodule.split(",");
+    // var keys = create.keyword.split("|");
+    // for(let j=0; j<keys.length; j++)
+    // {
+    //     if(info.baseClsName.indexOf(keys[j]) != -1)
+    //     {
+    //        varsDic["shortName"] = info.baseClsName.replace(keys[j], "");
+    //        break;
+    //     }
+    // }
+    // if(!varsDic["shortName"])varsDic["shortName"] = info.baseClsName;
+    // varsDic["shortname"] = varsDic["shortName"].charAt(0).toLowerCase()+varsDic["shortName"].substr(1);
+    // varsDic["moduleID"] = getModuleID(varsDic["shortName"]);
+    // for(let i=0; i<moduleIds.length; i++)
+    // {
+    //     let mod:ModuleInfo = config.module[moduleIds[i]];
+    //     if(!mod)
+    //     {
+    //         utils.log("app.config.json当前没有配置"+moduleIds[i]+"对应的配置")
+    //         continue;
+    //     }
+    //     createFileByModuld(mod, info, varsDic);
+    // }
+}
+
+function createCreate(create:CreateInfo, info:EUIInfo, varsDic:Object){
     let moduleIds = create.usemodule.split(",");
     var keys = create.keyword.split("|");
     for(let j=0; j<keys.length; j++)
@@ -82,6 +109,7 @@ function createCode(info:EUIInfo)
         }
     }
     if(!varsDic["shortName"])varsDic["shortName"] = info.baseClsName;
+    varsDic["shortname"] = varsDic["shortName"].charAt(0).toLowerCase()+varsDic["shortName"].substr(1);
     varsDic["moduleID"] = getModuleID(varsDic["shortName"]);
     for(let i=0; i<moduleIds.length; i++)
     {
@@ -140,6 +168,17 @@ function findModule(config:AppConfig, fileName:string)
     }
     return config.create[config.defaultcreate];
 }
+/**根据keyword 获取AppConfig中create的配置  返回CreateInfo*/
+function getCreateByName(config:AppConfig, keyword:string):CreateInfo
+{
+    let creates = config.create;
+    for(let i=0; i<creates.length; i++)
+    {
+        let create = creates[i];
+        if(create.keyword == keyword)return create;
+    }
+    return null;
+}
 
 
 /**根据ModuleInfo 生成对应的文件 */
@@ -151,7 +190,9 @@ function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
     let outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
     if(keyArr)
     {
-        outpath = path.join(rootpath, modinfo.outdir.replace(keyArr[0], keyArr[1]).trim(), varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+        let outdir = modinfo.outdir.replace(keyArr[0], keyArr[1]).trim();
+        outdir = outdir.replace("$floder", info.parentDir)
+        outpath = path.join(rootpath, outdir, varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
     }
     let exists = fs.existsSync(outpath);
     if(!modinfo.override && exists)
@@ -159,6 +200,15 @@ function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
         // utils.log("文件已存在不用生成")
         console.log("文件已存在不用生成");
         return;
+    }
+    if(modinfo.checkfloder)
+    {
+        let outpathinfo = path.parse(outpath);
+        if(fs.existsSync(outpathinfo.dir))
+        {
+             console.log("文件夹已存在不用生成");
+            return;
+        }
     }
     let areaDic={};
 

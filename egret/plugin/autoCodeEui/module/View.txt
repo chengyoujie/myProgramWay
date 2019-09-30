@@ -1,0 +1,24 @@
+namespace chm {
+    /**
+     * AutoCodeEui 生成的界面 
+     * euiPath:${path} 
+     * made by ${auth}
+     * create on ${time} 
+    */
+    export class ${shortName}View extends ${shortName}UI {
+
+        constructor(){
+            super();
+        }
+
+        /**界面打开**/
+        public onOpen() {
+            let self = this;
+        }
+
+        /**界面销毁**/
+        public destroy(): void {
+            let self = this;
+        }
+    }
+}

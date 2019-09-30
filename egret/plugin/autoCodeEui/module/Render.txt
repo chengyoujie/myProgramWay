@@ -1,37 +1,21 @@
-/**
- * AutoCodeEui 生成的界面 
- * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
- * euiPath:${path} 
- * made by ${auth}
- * create on ${time} 
- */
-class ${shortName}Render extends ${shortName}RenderUI {
+namespace chm {
+    /**
+     * AutoCodeEui 生成的界面 
+     * euiPath:${path} 
+     * made by ${auth}
+     * create on ${time} 
+    */
+    export class ${shortName}Render extends ${shortName}RenderUI {
     
-    constructor() {
-        super();
-    }
-
-    protected euiSKinComplete(e: egret.Event): void {
-        super.euiSKinComplete(e);
-    }
-    
-    /** 刷新 */
-    public dataChanged(): void {
-        super.dataChanged();
+        constructor() {
+            super();
+        }
+        
+        /** 数据发生改变 */
+        public dataChanged(): void {
+            super.dataChanged();
+        }
     }
 }
 
-class  ${shortName}RenderDecoder{
-    /**将数据转换${shortName}RenderVO类型的数据  方便赋值给dataSource**/
-    public static encode(...args):${shortName}RenderVO{
-        //let self = this;
-        //let {_dataSource} = self;
-        //if(!_dataSource)_dataSource = self._dataSource = {};
-        ////TODO 处理数据转换
-        ////_dataSource.XXX = args[0].XXX;
-        //return _dataSource;
-        return vo;
-    }
-
-}
     

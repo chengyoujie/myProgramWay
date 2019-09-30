@@ -64,4 +64,6 @@ interface ModuleInfo{
     override:boolean;
     /**生成的文件后缀名 */
     fileType:string;
+    /**检查当前文件夹是否存在，如果存在则不再生成 */
+    checkfloder:boolean;
 }

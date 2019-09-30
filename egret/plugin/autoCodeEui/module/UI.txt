@@ -1,16 +1,17 @@
-/**
- * AutoCodeEui 生成的界面 
- * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
- * euiPath:${path} 
- * made by ${auth}
- * create on ${time} 
- */
-class ${shortName}UI extends EuiComponentBase {
+namespace chm {
+    /**
+     * AutoCodeEui 生成的界面 
+     * euiPath:${path} 
+     * made by ${auth}
+     * create on ${time} 
+    */
+    export class ${shortName}UI extends Component {
 
-    ${varids}
-    
-    constructor(){
-        super();
-        this.euiSkinName = '${skinName}';
+        ${varids}
+        
+        constructor(){
+            super();
+            this.skinName = '${skinName}';
+        }
     }
 }

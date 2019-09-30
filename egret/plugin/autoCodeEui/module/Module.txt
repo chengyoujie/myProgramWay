@@ -1,52 +1,20 @@
-/**
- * AutoCodeEui 生成的界面 
- * http://svn.jiulingwan.com/CQLL/cqll-devel/client/tags/tools/AutoCodeEUI
- * euiPath:${path} 
- * made by ${auth}
- * create on ${time} 
- */
-class ${shortName}Module extends ModuleBase {
+module chm {
+    /**
+     * AutoCodeEui 生成的界面 
+     * euiPath:${path} 
+     * made by ${auth}
+     * create on ${time} 
+    */
+	export class ${shortName}Model extends BaseModel {
+		public constructor() {
+			super();
+		}
 
-    private _mediator:${shortName}Mediator;
-    private _service:${shortName}Service;
-    
-    constructor() {
-        super("${shortName}Module");
-    }
+		/**接受协议 */
+		//private n_xxx(vo: S_XXXX) {
+		//	let s = this;
+		//}
+	}
 
-    public startup():void
-    {
-        let self = this;
-        self._mediator = new ${shortName}Mediator(self);
-        self._service = new ${shortName}Service(self);
-        self.addEventListeners();
-    }
-
-    public shutDown():void
-    {
-        let self = this;
-        self.removeEventListeners();
-    }
-
-
-    protected addEventListeners()
-    {
-        let self = this;
-        cqobs.on(ModuleEventType.CLICK_MODULEID, self.handleOpen, self);
-    }
-    protected removeEventListeners():void
-    {
-        let self = this;
-        cqobs.off(ModuleEventType.CLICK_MODULEID, self.handleOpen, self);
-    }
-
-    private handleOpen(e:GameEvent)
-    {
-        let data = e.data;
-        if(data == ModuleID.${moduleID})
-        {
-            this._mediator.startup();
-            this._mediator.showPanel();
-        }
-    }
+	export let ${shortname}Model: ${shortName}Model;
 }
