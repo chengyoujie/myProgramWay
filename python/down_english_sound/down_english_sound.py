@@ -12,7 +12,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 cookie = cookiejar.CookieJar();
 handler = request.HTTPCookieProcessor(cookie)
 opener = request.build_opener(handler)
-resopnse = opener.open("http://pc.shuren100.com/web/user/center/user_id/212393/type/1/btype/121.html");
+resopnse = opener.open("http://www.shuren100.com/Home/Hearing/index/p_id/2/t_id/10/p/1.html");
 for item in cookie:
 	print("Name: " + item.name +"Value:"+ item.value)
 def loadpage(page, opener):
@@ -62,3 +62,6 @@ for i in range(1,34):
 	if not loadpage(i, opener):
 		break;
 #href="/ueditor/php/upload/file/20180817/1534503315836392.mp3"
+
+
+# http://www.shuren100.com/Public/Upload/mp3/8da9e566fb265462b4d5c5cebf663079.mp3

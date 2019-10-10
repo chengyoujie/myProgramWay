@@ -17,7 +17,7 @@
 |----cqapp自己写的工具集合，目前只有打包工具
 |
 |python Python相关的练习
-|----down_english_sound  下载pc.shuren100.com的声音文件
+|----down_english_sound  下载pc.shuren100.com的声音文件  down_english_sound.py（网站已改版，用不了了）  down_sound.py为改版后资源下载代码
 |----aigei               下载aigei.com的资源（需要本地chrome先登录aigei网）
 |
 |nodejs   NodeJs相关的练习
