@@ -7,6 +7,7 @@
 var exec = require("child_process").exec;
 var path = require("path")
 var fs = require("fs")
+var os = require("os")
 
 //变量
 var rootpath = "D:/client2/trunk/yscq";
@@ -15,17 +16,25 @@ var binpath = "bin-release/web/";
 var curbinpath = "";
 var svnnum = 0;//版本号是显示项目代码的还是提交的？
 var svnpath = path.join(__dirname, "./tools/svn")
+var msvcrpath = path.join(__dirname, "./tools/msvcr")
 var userip = "127.0.0.1";
 var isrun = false;
-var outFileName = ["theme.js", "main.min.js", "configSetting.js"]
-var ignoreFileName = ["index.html", "gameEui.json"]
-var svnIngnoreCommitFile = ["config.zzp"]
+// var outFileName = ["theme.js", "main.min.js", "configSetting.js"]
+// var ignoreFileName = ["index.html", "gameEui.json"]
+// var svnIngnoreCommitFile = ["config.zzp"]
+var projectData;
 
 
 /**开始更新发布的svn目录及代码 */
 function doSvnUpdate()
 {
     log("开始更新发布项目代码")
+    if(!projectData)
+    {
+        isrun = false;
+        log("发布失败, 没有项目数据")
+        return;
+    }
     cmdOper("svn update "+publishpath, function(stdout){
         cmdOper("svn update "+rootpath, function(stdout){
             let svnReg = /\s+revision\s+(\d+)\./gi;
@@ -59,7 +68,12 @@ function doSvnUpdate()
             //开始打包
             doPublish();
         }, "更新项目代码")
-    },"更新publish")
+    },
+    "更新publish",
+    undefined,
+    function(errMsg){
+        log("svn执行错误，请检查目录是否正确，或者尝试<a onclick='repaireSvn()' href='javascript:void(0);'>打开修复svn文件夹</a>")
+    })
 }
 
 /**开始编译代码 */
@@ -118,9 +132,9 @@ function hanldeFile(url)
 {
     let info = path.parse(url);
     let fname = info.name+info.ext;
-    if(ignoreFileName.indexOf(fname) != -1)return;
+    if(projectData.ignoreFileName.indexOf(fname) != -1)return;
     let outurl;
-    if(outFileName.indexOf(fname)!=-1)
+    if(projectData.outFileName.indexOf(fname)!=-1)
     {
         outurl = path.join(publishpath, fname);
         fs.copyFileSync(url, outurl);
@@ -158,7 +172,7 @@ function doSvnCommit()
         {
             let finfo = path.parse(tempArr[1]);
             let fname = finfo.name + finfo.ext;
-            if(svnIngnoreCommitFile.indexOf(fname) != -1)//config.zzp 不提交 由策划负责
+            if(projectData.svnIngnoreCommitFile.indexOf(fname) != -1)//config.zzp 不提交 由策划负责
             {
                 continue;
             }
@@ -213,8 +227,9 @@ function doSvnCommit()
  * @param {*} des       命令行描述， 日志输出时用到
  * @param {*} path      命令行所在路径， 如果为空则使用tools/svn路径
  */
-function cmdOper(cmd, finish, des, path)
+function cmdOper(cmd, finish, des, path, errFun)
 {
+    des = des||"";
     path = path || svnpath;
     log("执行"+des);
     log(cmd);
@@ -222,11 +237,13 @@ function cmdOper(cmd, finish, des, path)
         if(err)
         {
             log(err.message);
+            if(errFun)errFun(err.message);
             log("<font color='#ff0000'>"+des+"命令错误</font>")
             isrun = false;
             log("<font color='#ff0000'>发布失败，发布结束</font>")
         }else if(stderr){
             log(stderr)
+            if(errFun)errFun(stderr);
             log("<font color='#ff0000'>"+des+"错误：</font>");
             isrun = false;
             log("<font color='#ff0000'>发布失败，发布结束</font>")
@@ -314,6 +331,21 @@ function isRun(){
     return isrun;
 }
 
+/**修复svn */
+function repaireSvn()
+{
+    let batpath;
+    if(os.arch() == "x64")
+    {
+        batpath = path.join(msvcrpath,"64位系统请右键管理员运行.bat")
+    }else{
+        batpath = path.join(msvcrpath,"32位系统请右键管理员运行.bat")
+    }
+    // fs.copyFileSync(dllpath, "C:/Windows/System32");
+    cmdOper("explorer /select,"+batpath, undefined, "打开修复svn文件夹")
+    // cmdOper("explorer "+msvcrpath, undefined, "修复svn问题")
+}
+
 /**发布入口函数 */
 function run(config, data)
 {
@@ -322,9 +354,14 @@ function run(config, data)
         log("操作错误，不能发布"+data.oper);
         return;
     }
-    let type = data.type;
-    let codepath =  config.project[type].codepath;
-    let pubpath = config.project[type].pubpath;
+    projectData = data.data;
+    if(!projectData)
+    {
+        log("没有数据，请重新选择项目");
+        return;
+    }
+    let codepath =  config.project[projectData.id].codepath;
+    let pubpath = config.project[projectData.id].pubpath;
     if(!codepath)
     {
         log("<font color='#ff0000'>当前代码路径为空</font>")
@@ -342,18 +379,23 @@ function run(config, data)
     }
     rootpath = codepath;
     publishpath = pubpath;
-    if(type == "inner_mingame")//小游戏
-    {
-        outFileName = []
-        ignoreFileName = ["index.html"]
-        svnIngnoreCommitFile = ["config_ios.bin", "config.bin"]
-        log("发布【小程序】版本")
-    }else if(type == "inner_game"){//inner_game
-        outFileName = ["theme.js", "main.min.js", "configSetting.js"]
-        ignoreFileName = ["index.html", "gameEui.json"]
-        svnIngnoreCommitFile = ["config.zzp"]
-        log("发布【国内】版本")
-    }
+    // outFileName = data.outFileName;
+    // ignoreFileName = data.ignoreFileName;
+    // svnIngnoreCommitFile = data.svnIngnoreCommitFile;
+    log("发布【"+projectData.name+"】版本")
+    // if(type == "inner_mingame")//小游戏
+    // {
+    //     outFileName = []
+    //     ignoreFileName = ["index.html"]
+    //     svnIngnoreCommitFile = ["config_ios.bin", "config.bin"]
+    //     log("发布【小程序】版本")
+    // }else if(type == "inner_game"){//inner_game
+    //     outFileName = ["theme.js", "main.min.js", "configSetting.js"]
+    //     ignoreFileName = ["index.html", "gameEui.json"]
+    //     svnIngnoreCommitFile = ["config.zzp"]
+    //     log("发布【国内】版本")
+    // }
+    
     userip = config.user;
     isrun = true;
     doSvnUpdate();
@@ -365,6 +407,7 @@ module.exports = {
     run,
     setLogFun,
     isRun,
+    repaireSvn,
 }
 
 

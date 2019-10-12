@@ -43,9 +43,7 @@
             <table>
               <tr>
                 <td rowspan="2" style="text-align: center" width='150px'>
-                    选择版本<select id="projectSel" class="easyui-combobox"  style="width:120px;">
-                        <option value="inner_game">国内内网版本</option>
-                        <option value="inner_mingame">小程序内网版本</option>
+                    选择版本<select id="projectSel" class="easyui-combobox"  style="width:120px;" data-options="valueField:'id',textField:'name',panelHeight:'auto'">
                       </select>
                 </td>
                 <td width="20px"></td>
@@ -85,41 +83,73 @@
             var fs = require("fs");
             var path = require("path")
             const ipc = require('electron').ipcRenderer;
-            var configpath = path.join(__dirname, "app.config");
-            var configdata;
-            var projectType;
+            var useconfig = path.join(__dirname, "user.config");
+            var appconfig = path.join(__dirname, "app.config");
+            var usedata;
+            var appdata;
+            var selectProjectData;
             publish.setLogFun(log);
             //初始化时检测是否显示登录界面
             window.onload = function()
             {
               log("系统初始化成功")
-              if(!fs.existsSync(configpath))
+              if(!fs.existsSync(useconfig))
               {
-                  configdata = {};
+                  usedata = {};
                   log("<font color='#ff0000'>请先登录系统</font>")
                   $("#login").window('open'); 
               }else{
-                  let data = fs.readFileSync(configpath, {encoding:"utf-8"});
-                  configdata = JSON.parse(data);
-                  if(!configdata.user)
+                  let data = fs.readFileSync(useconfig, {encoding:"utf-8"});
+                  usedata = JSON.parse(data);
+                  if(!usedata.user)
                   {
                     log("<font color='#ff0000'>请先登录系统</font>")
                     $("#login").window('open');
                   }else{
-                    log("<font color='#0000ff'>"+configdata.user+"</font>登录成功")
+                    log("<font color='#0000ff'>"+usedata.user+"</font>登录成功")
                     $("#login").window('close'); 
                   }
               }
+              if(!fs.existsSync(appconfig))
+              {
+                $.messager.alert('提示','程序配置未找到'+appconfig,'info');
+                return;
+              }else{
+                let data = fs.readFileSync(appconfig, {encoding:"utf-8"});
+                appdata = JSON.parse(data);
+              }
+              let selectdata = [];
+              let defselect = "";
+              let projects = appdata.project;
+              if(projects)
+              {
+                for(let i=0; i<projects.length; i++)
+                {
+                  let item = projects[i];
+                  if(!item)continue;
+                  if(item.selected)defselect = item;
+                  selectdata.push(item);
+                }
+                if(!defselect)defselect = projects.length>0?projects[0]:null;
+              }
               
+              $("#projectSel").combobox("loadData", selectdata);
               //选择项目
               $("#projectSel").combobox(
                 {
+                  loadData:selectdata,
+                  editable: false, //不可编辑状态
                   onSelect:function(param){
                     projectChange(param)
                   }
                 }
               );
-              projectChange();
+
+              $('#projectSel').combobox('select', defselect.id);
+              projectChange(defselect);
+              // $("#projectSel").val(0);
+
+
             }
             //选择代码路径
             $('#codepath').textbox({
@@ -135,7 +165,7 @@
             if(!files || files.length==0)return;
             let codepath = files[0].path;
             $('#codepath').textbox('setValue', codepath);
-            configdata.project[projectType].codepath = codepath;
+            usedata.project[selectProjectData.id].codepath = codepath;
             saveConfig();
           })
 
@@ -153,22 +183,22 @@
             if(!files || files.length==0)return;
             let pubpath = files[0].path;
             $('#pubpath').textbox('setValue', pubpath);
-            configdata.project[projectType].pubpath = pubpath;
+            usedata.project[selectProjectData.id].pubpath = pubpath;
             saveConfig();
           })
           //项目发生改变
           function projectChange(param)
           {
-            let selvale = param?param.value:$("#projectSel").find("option:selected").val();
-            if(selvale == projectType)return;
-            let selename = param?param.text:$("#projectSel").find("option:selected").text();
-            log("当前选中<font color='#0000ff'>"+selename+"</font>");
-            projectType = selvale;
-            if(!configdata)configdata = {};
-            if(!configdata.project)configdata.project = {};
-            if(!configdata.project[projectType])configdata.project[projectType] = {};
-            let codepath = configdata.project[projectType].codepath || "";
-            let pubpath = configdata.project[projectType].pubpath || "";
+            if(!param)return;
+            // if(selvale == projectType)return;
+            // let selename = param?param.text:$("#projectSel").find("option:selected").text();
+            log("当前选中<font color='#0000ff'>"+param.name+"</font>");
+            selectProjectData = param;
+            if(!usedata)usedata = {};
+            if(!usedata.project)usedata.project = {};
+            if(!usedata.project[param.id])usedata.project[param.id] = {};
+            let codepath = usedata.project[selectProjectData.id].codepath || "";
+            let pubpath = usedata.project[selectProjectData.id].pubpath || "";
             $('#codepath').textbox('setValue', codepath);
             $('#pubpath').textbox('setValue', pubpath);
           }
@@ -178,8 +208,8 @@
             switch(data.type)
             {
               case "login":
-                if(configdata)
-                  $("#username").val(configdata.user);
+                if(usedata)
+                  $("#username").val(usedata.user);
                 $("#login").window('open');
               break;
             }
@@ -193,26 +223,32 @@
             $.messager.alert('提示','名字不能为空!','info');
             return;
           } 
-          configdata.user = uname;
+          usedata.user = uname;
           $("#login").window('close'); 
           saveConfig();
-          log("<font color='#0000ff'>"+configdata.user+"</font>登录成功")
+          log("<font color='#0000ff'>"+usedata.user+"</font>登录成功")
         })
 
         function saveConfig()
         {
-          if(!configdata)configdata = {};
-          fs.writeFileSync(configpath, JSON.stringify(configdata), "utf-8");
+          if(!usedata)usedata = {};
+          fs.writeFileSync(useconfig, JSON.stringify(usedata), "utf-8");
+        }
+
+        function repaireSvn()
+        {
+          // $.messager.alert('提示','开始修复svn!','info');
+          publish.repaireSvn();
         }
 
 
         $("#btn_publish").click(function(){
-          if(!projectType)
+          if(!selectProjectData)
           {
             $.messager.alert('提示','当前没有选择项目，请重新选择!','info');
             return;
           }
-          send({oper:"publish", type:projectType})
+          send({oper:"publish", data:selectProjectData})
         });
             
             // $("#btn_mingame").click(function(){
@@ -225,7 +261,7 @@
 
             function send(data){
                 if(!data)return;
-                publish.run(configdata, data);
+                publish.run(usedata, data);
             }
 
             function log(msg)
