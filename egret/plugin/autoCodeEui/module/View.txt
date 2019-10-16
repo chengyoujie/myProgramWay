@@ -7,18 +7,18 @@ namespace chm {
     */
     export class ${shortName}View extends ${shortName}UI {
 
-        constructor(){
-            super();
+        constructor(opt: ShowOptions){
+            super(opt);
         }
 
         /**界面打开**/
         public onOpen() {
-            let self = this;
+            
         }
 
         /**界面销毁**/
         public destroy(): void {
-            let self = this;
+            super.destroy();
         }
     }
 }

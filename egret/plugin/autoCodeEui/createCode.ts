@@ -41,6 +41,17 @@ function createCode(info:EUIInfo)
     let configtxt = fs.readFileSync(configpath, 'utf-8');
     config = JSON.parse(configtxt);
     moduleCodePath = config.moduleCodePath;
+    
+	let pathinfo = path.parse(info.path);
+	let skinPathIndex = config.skinRootPath?path.normalize(pathinfo.dir).indexOf(path.normalize(config.skinRootPath)):-1;
+	if(skinPathIndex != -1)
+	{
+		info.parentDir = path.normalize(pathinfo.dir).substr(skinPathIndex+path.normalize(config.skinRootPath).length);
+	}else{
+		let pathdirarr = path.normalize(pathinfo.dir).split(path.sep);
+		info.parentDir = pathdirarr[pathdirarr.length-1];
+	}
+
     let varsDic = {};
     varsDic["auth"] = config.auth  || getHostName() || os.userInfo().username;
     let date = new Date();

@@ -41,6 +41,8 @@ interface AppConfig{
     create:CreateInfo[];
     module:{[id:number]:ModuleInfo};
     moduleCodePath:string;
+    /**皮肤的根路径 */
+    skinRootPath:string;
 }
 /**创建模板的信息 */
 interface CreateInfo{

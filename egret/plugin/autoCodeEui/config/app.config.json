@@ -1,6 +1,7 @@
 {
     "auth":"",
     "defaultcreate":0,
+    "skinRootPath":"resource/skin/module/",
     "moduleCodePath":"src/game/module/",
     "create":
     [   

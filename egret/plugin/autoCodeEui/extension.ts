@@ -66,8 +66,6 @@ function euiOutCode() {
 		euiinfo.skinName = euiinfo.baseClsName;
 	}
 	euiinfo.baseClsName = euiinfo.baseClsName;
-	let pathdirarr = path.normalize(pathinfo.dir).split(path.sep);
-	euiinfo.parentDir = pathdirarr[pathdirarr.length-1];
 	code.createCode(euiinfo);
 }
 
