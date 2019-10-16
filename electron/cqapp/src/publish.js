@@ -36,6 +36,21 @@ function doSvnUpdate()
         return;
     }
     cmdOper("svn update "+publishpath, function(stdout){
+        let cofReg = /C\s+(.*?)\s*[\r\n]/g;
+        let cofArr = cofReg.exec(stdout);
+        if(cofArr)//冲突处理
+        {
+            log("检测到有冲突文件");
+            while(cofArr)
+            {
+                log("冲突文件： "+cofArr[1]);
+                cofArr = cofReg.exec(stdout);
+            }
+            isrun = false;
+            log("<font color='#ff0000'>发布失败，Publish有冲突文件</font>");
+            msgAlert("<font color='#ff0000'>发布失败，Publish有冲突文件</font>");
+            return;
+        }
         cmdOper("svn update "+rootpath, function(stdout){
             let svnReg = /\s+revision\s+(\d+)\./gi;
             let cofReg = /C\s+(.*?)\s*[\r\n]/g;
@@ -51,11 +66,13 @@ function doSvnUpdate()
                 log("检测到有冲突文件");
                 while(cofArr)
                 {
-                    cofArr = cofReg.exec(stdout);
                     log("冲突文件： "+cofArr[1]);
+                    cofArr = cofReg.exec(stdout);
                 }
                 isrun = false;
                 log("<font color='#ff0000'>发布失败，有冲突文件</font>");
+                msgAlert("<font color='#ff0000'>发布失败，有冲突文件</font>");
+                return;
             }
             let svnArr = svnReg.exec(stdout);
             if(svnArr)
@@ -109,6 +126,7 @@ function doCopy()
         log("当前没有找到生成的文件");
         isrun = false;
         log("发布失败")
+        msgAlert("发布失败");
         return;
     }
     
@@ -157,7 +175,7 @@ function doSvnCommit()
     cmdOper("svn stat "+publishpath, function(stdout){
         let addReg = /\?\s+(.*?)\s*[\r\n]/g;
         let modReg = /[MA]\s+(.*?)\s*[\r\n]/g;
-        let remReg = /\!\s+(.*?)\s*[\r\n]/g;
+        let remReg = /[\!D]\s+(.*?)\s*[\r\n]/g;
         let addFiles = [];
         let modFiles = [];
         let remFiles = [];
@@ -188,11 +206,16 @@ function doSvnCommit()
         {
             cmdOper("svn add "+addFiles.join(" "), (stdout)=>{
                 addFiles.length = 0;
+                if(remFiles.length > 0)
+                {
+                    cmdOper("svn delete "+remFiles.join(" "), (stdout)=>{
+                        remFiles.length = 0;
+                        doComit();
+                    }, "svn删除文件");
+                }
                 doComit();
             }, "svn添加文件");
-        }
-        
-        if(remFiles.length > 0)
+        }else if(remFiles.length > 0)
         {
             cmdOper("svn delete "+remFiles.join(" "), (stdout)=>{
                 remFiles.length = 0;
@@ -206,12 +229,14 @@ function doSvnCommit()
                 log("当前没有可提交的文件")
                 isrun = false;
                 log("发布结束");
+                msgAlert("发布结束");
                 return;
             }
             if(addFiles.length==0 && remFiles.length == 0)
             {
                 cmdOper("svn commit "+allFiles.join(" ") +" -m \"更新 by:"+userip+"\"", (stdout)=>{
                     log("发布完成")
+                    msgAlert("发布完成");
                     isrun = false;
                 }, "svn提交文件");
             }
@@ -241,12 +266,14 @@ function cmdOper(cmd, finish, des, path, errFun)
             log("<font color='#ff0000'>"+des+"命令错误</font>")
             isrun = false;
             log("<font color='#ff0000'>发布失败，发布结束</font>")
+            msgAlert("发布失败，发布结束");
         }else if(stderr){
             log(stderr)
             if(errFun)errFun(stderr);
             log("<font color='#ff0000'>"+des+"错误：</font>");
             isrun = false;
             log("<font color='#ff0000'>发布失败，发布结束</font>")
+            msgAlert("发布失败，发布结束");
         }else{
             log(stdout);
             log(des+"完成");
@@ -318,13 +345,20 @@ function log(msg){
     if(logFun)
         logFun(msg+"\n");
 }
+function msgAlert(msg){
+    msgAlertFun(msg);
+}
 /**日志的外部调用函数 logFun(msg)*/
 var logFun;
-
+var msgAlertFun;
 /**从外部设置日志的调用方法 */
 function setLogFun(fun)
 {
     logFun = fun;
+}
+function setAlertFun(fun)
+{
+    msgAlertFun = fun;
 }
 /**当前程序是否正在发布版本状态 */
 function isRun(){
@@ -352,12 +386,14 @@ function run(config, data)
     if(data.oper != "publish")
     {
         log("操作错误，不能发布"+data.oper);
+        msgAlert("操作错误，不能发布"+data.oper);
         return;
     }
     projectData = data.data;
     if(!projectData)
     {
         log("没有数据，请重新选择项目");
+        msgAlert("没有数据，请重新选择项目");
         return;
     }
     let codepath =  config.project[projectData.id].codepath;
@@ -408,6 +444,7 @@ module.exports = {
     setLogFun,
     isRun,
     repaireSvn,
+    setAlertFun,
 }
 
 

@@ -89,6 +89,7 @@
             var appdata;
             var selectProjectData;
             publish.setLogFun(log);
+            publish.setAlertFun(msgAlert)
             //初始化时检测是否显示登录界面
             window.onload = function()
             {
@@ -268,6 +269,11 @@
             {
                 $("#logmsg").append(msg+"\n")
                 $("#logmsg").scrollTop($("#logmsg")[0].scrollHeight);
+            }
+
+            function msgAlert(msg)
+            {
+              $.messager.alert('提示',msg,'info');
             }
             resize();
             $(window).resize(resize);  
