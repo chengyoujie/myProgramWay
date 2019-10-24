@@ -52,7 +52,10 @@
                     <!-- 程序目录： <input id="codepath"  class="easyui-filebox" type=file webkitdirectory style="width:250px"><br/> -->
                 </td>
                 <td rowspan="2" style="text-align: center" width='150px'>
-                    <a id="btn_publish" class="easyui-linkbutton" style="width: 120px;height:45px">发布</a>
+                    <a id="btn_publish" class="easyui-linkbutton" style="width: 120px;height:45px">一键发布</a>
+                </td>
+                <td>
+                  <a id="btn_oper1" class="easyui-linkbutton" style="width: 100px;height:25px">1.更新代码</a>
                 </td>
               </tr>
               <tr>
@@ -60,7 +63,18 @@
                 <td>
                     输出目录：<input id="pubpath" class="easyui-textbox" data-options="" style="width:250px"><input id="selePub" type=file webkitdirectory hidden='true'>
                 </td>
+                <td>
+                  <a id="btn_oper2" class="easyui-linkbutton" style="width: 100px;height:25px">2.编译程序</a>
+                </td>
+              </tr>
+              <tr>
                 <td width="20px"></td>
+                <td width="20px"></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <a id="btn_oper3" class="easyui-linkbutton" style="width: 100px;height:25px">3.上传程序</a>
+                </td>
               </tr>
             </table>
             <hr/>
@@ -244,12 +258,16 @@
 
 
         $("#btn_publish").click(function(){
-          if(!selectProjectData)
-          {
-            $.messager.alert('提示','当前没有选择项目，请重新选择!','info');
-            return;
-          }
-          send({oper:"publish", data:selectProjectData})
+          send(0)
+        });
+        $("#btn_oper1").click(function(){
+          send(1)
+        });
+        $("#btn_oper2").click(function(){
+          send(2)
+        });
+        $("#btn_oper3").click(function(){
+          send(3)
         });
             
             // $("#btn_mingame").click(function(){
@@ -259,10 +277,14 @@
             $("#btn_clearlog").click(function(){
                 $("#logmsg").text("");
             })
-
-            function send(data){
-                if(!data)return;
-                publish.run(usedata, data);
+            //发布版本  step 0 一键发布   1更新  2编译   3提交svn
+            function send(step){
+              if(!selectProjectData)
+              {
+                $.messager.alert('提示','当前没有选择项目，请重新选择!','info');
+                return;
+              }
+                publish.run(usedata, {oper:"publish", data:selectProjectData, step:step});
             }
 
             function log(msg)

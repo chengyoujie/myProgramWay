@@ -4,6 +4,16 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+
+
+var child_process = require('child_process');
+var iconv = require('iconv-lite');
+var encoding = 'cp936';
+var binaryEncoding = 'binary';
+
+child_process.exec('svn stat D:\\publish', { encoding: binaryEncoding, cwd:"D:\\myProgream\\myProgramWay\\electron\\cqapp\\src\\tools\\svn" }, function(err, stdout, stderr){
+    console.log(iconv.decode(new Buffer(stdout, binaryEncoding), encoding, {addBOM:false}), iconv.decode(new Buffer(stderr, binaryEncoding), encoding));
+});
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;

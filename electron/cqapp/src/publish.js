@@ -8,6 +8,8 @@ var exec = require("child_process").exec;
 var path = require("path")
 var fs = require("fs")
 var os = require("os")
+var iconv = require("iconv-lite")
+var encoding = require("encoding")
 
 //变量
 var rootpath = "D:/client2/trunk/yscq";
@@ -26,13 +28,13 @@ var projectData;
 
 
 /**开始更新发布的svn目录及代码 */
-function doSvnUpdate()
+function doSvnUpdate(runNext)
 {
     log("开始更新发布项目代码")
     if(!projectData)
     {
         isrun = false;
-        log("发布失败, 没有项目数据")
+        log("更新失败, 没有项目数据")
         return;
     }
     cmdOper("svn update "+publishpath, function(stdout){
@@ -43,12 +45,12 @@ function doSvnUpdate()
             log("检测到有冲突文件");
             while(cofArr)
             {
-                log("冲突文件： "+cofArr[1]);
+                log("<font color='#ff0000'>冲突文件： "+cofArr[1]+"</font>");
                 cofArr = cofReg.exec(stdout);
             }
             isrun = false;
-            log("<font color='#ff0000'>发布失败，Publish有冲突文件</font>");
-            msgAlert("<font color='#ff0000'>发布失败，Publish有冲突文件</font>");
+            log("<font color='#ff0000'>更新失败，Publish有冲突文件</font>");
+            msgAlert("<font color='#ff0000'>更新失败，Publish有冲突文件</font>");
             return;
         }
         cmdOper("svn update "+rootpath, function(stdout){
@@ -66,12 +68,12 @@ function doSvnUpdate()
                 log("检测到有冲突文件");
                 while(cofArr)
                 {
-                    log("冲突文件： "+cofArr[1]);
+                    log("<font color='#ff0000'>冲突文件： "+cofArr[1]+"</font>");
                     cofArr = cofReg.exec(stdout);
                 }
                 isrun = false;
-                log("<font color='#ff0000'>发布失败，有冲突文件</font>");
-                msgAlert("<font color='#ff0000'>发布失败，有冲突文件</font>");
+                log("<font color='#ff0000'>更新失败，有冲突文件</font>");
+                msgAlert("<font color='#ff0000'>更新失败，有冲突文件</font>");
                 return;
             }
             let svnArr = svnReg.exec(stdout);
@@ -81,9 +83,16 @@ function doSvnUpdate()
             }else{
                 svnnum = 0;
             }
-            log("当前代码svn版本号：<font color='#00ff00'>"+svnnum+"</font>");
+            log("当前代码svn版本号：<font color='#0000ff'>"+svnnum+"</font>");
             //开始打包
-            doPublish();
+            if(runNext)
+            {
+                doPublish(runNext);
+            }else{
+                isrun = false;
+                msgAlert("版本更新完毕svn版本号：<font color='#0000ff'>"+svnnum+"</font>")
+            }
+                
         }, "更新项目代码")
     },
     "更新publish",
@@ -94,15 +103,15 @@ function doSvnUpdate()
 }
 
 /**开始编译代码 */
-function doPublish()
+function doPublish(runNext)
 {
     cmdOper("egret publish "+rootpath, function(stdout){
-        doCopy();
+        doCopy(runNext);
     }, "编译项目", rootpath)
 }
 
 /**开始拷贝文件到发布目录 */
-function doCopy()
+function doCopy(runNext)
 {
     log("开始拷贝")
     let allbinpath = path.join(rootpath, binpath);
@@ -125,15 +134,15 @@ function doCopy()
     {
         log("当前没有找到生成的文件");
         isrun = false;
-        log("发布失败")
-        msgAlert("发布失败");
+        log("拷贝失败")
+        msgAlert("拷贝失败");
         return;
     }
     
     log("开始拷贝"+lastUrl+" -> "+publishpath)
     curbinpath = lastUrl;
     let bininfo = path.parse(curbinpath);
-    log("当前版本：<font color='#00ff00'>"+bininfo.name+"</font>");
+    log("当前版本：<font color='#0000ff'>"+bininfo.name+"</font>");
     let respath = path.join(publishpath, "resource");
     if(fs.existsSync(respath))
         rmdirSync(respath);//删掉之前的资源
@@ -142,7 +151,13 @@ function doCopy()
         rmdirSync(jspath);//删掉之前js的资源
     walkDir(curbinpath, hanldeFile, null, null);
     log("拷贝完成");
-    doSvnCommit();
+    if(runNext)
+    {
+        doSvnCommit();
+    }else{
+        isrun = false;
+        msgAlert("项目代码编译拷贝完毕当前版本：<font color='#0000ff'>"+bininfo.name+"</font>")
+    }
 }
 
 /**处理拷贝文件 */
@@ -173,35 +188,87 @@ function doSvnCommit()
 {
     // log("开始提交项目")
     cmdOper("svn stat "+publishpath, function(stdout){
-        let addReg = /\?\s+(.*?)\s*[\r\n]/g;
-        let modReg = /[MA]\s+(.*?)\s*[\r\n]/g;
-        let remReg = /[\!D]\s+(.*?)\s*[\r\n]/g;
+        // let addReg = /\?\s+(.*?)\s*[\r\n]/g;
+        // let modReg = /[MA]\s+(.*?)\s*[\r\n]/g;
+        // let remReg = /[\!D]\s+(.*?)\s*[\r\n]/g;
+        let changeReg = /([\S])\s+(.*?)\s*[\r\n]/g;
         let addFiles = [];
         let modFiles = [];
         let remFiles = [];
+        let confiltFiles = [];
         let allFiles = [];
+        let allFilesDic = {};
         let tempArr;
-        while(tempArr = addReg.exec(stdout))
+        while(tempArr = changeReg.exec(stdout))
         {
-            addFiles.push(tempArr[1]);
-            allFiles.push(tempArr[1]);
-        }
-        while(tempArr = modReg.exec(stdout))
-        {
-            let finfo = path.parse(tempArr[1]);
+            let finfo = path.parse(tempArr[2]);
             let fname = finfo.name + finfo.ext;
             if(projectData.svnIngnoreCommitFile.indexOf(fname) != -1)//config.zzp 不提交 由策划负责
             {
                 continue;
             }
-            modFiles.push(tempArr[1]);
-            allFiles.push(tempArr[1]);
+            allFilesDic[tempArr[2]] = {key:tempArr[1].trim(), path:tempArr[2]}
         }
-        while(tempArr = remReg.exec(stdout))
+        for(let key in allFilesDic)
         {
-            remFiles.push(tempArr[1]);
-            allFiles.push(tempArr[1]);
+            let info = allFilesDic[key];
+            if(info.key == "?")
+                addFiles.push(key);
+            else if(info.key == "M" || info.key == "A")
+                modFiles.push(key);
+            else if(info.key == "!" || info.key == "D")    
+                remFiles.push(key);
+            else if(info.key == "C")
+                confiltFiles.push(key)
+            else
+                log("没有找到对应的处理方法： "+info.key + "  "+info.path)
+            allFiles.push(key);
         }
+        if(confiltFiles.length>0)
+        {
+            for(let i=9; i<confiltFiles.length; i++)
+            {
+                log("<font color='#ff0000'>"+confiltFiles[i]+"</font>");
+            }
+            isrun = false;
+            log("<font color='#ff0000'>发布失败，有冲突文件</font>");
+            msgAlert("<font color='#ff0000'>发布失败，有冲突文件</font>");
+            return;
+        }
+        // for(let key in allFiles)
+        // {
+        //     let info = allFiles[key];
+        //     if(info.key == "?")
+        //         addFiles.push(tempArr[1]);
+        // }
+        // for(let key in allFiles)
+        // {
+        //     let info = allFiles[key];
+        //     if(info.key == "M" || info.key == "A")
+        //         modFiles.push(tempArr[1]);
+        // }
+        // for(let key in allFiles)
+        // {
+        //     let info = allFiles[key];
+        //     if(info.key == "!" || info.key == "D")
+        //         remFiles.push(tempArr[1]);
+        // }
+        // while(tempArr = modReg.exec(stdout))
+        // {
+        //     let finfo = path.parse(tempArr[1]);
+        //     let fname = finfo.name + finfo.ext;
+        //     if(projectData.svnIngnoreCommitFile.indexOf(fname) != -1)//config.zzp 不提交 由策划负责
+        //     {
+        //         continue;
+        //     }
+        //     modFiles.push(tempArr[1]);
+        //     allFiles.push(tempArr[1]);
+        // }
+        // while(tempArr = remReg.exec(stdout))
+        // {
+        //     remFiles.push(tempArr[1]);
+        //     allFiles.push(tempArr[1]);
+        // }
         if(addFiles.length > 0)
         {
             cmdOper("svn add "+addFiles.join(" "), (stdout)=>{
@@ -244,7 +311,8 @@ function doSvnCommit()
 
     }, "获取svn文件状态");
 }
-
+var encoding = 'cp936';
+var binaryEncoding = 'binary';
 /**
  * cmd 操作
  * @param {*} cmd   命令行语句
@@ -259,6 +327,15 @@ function cmdOper(cmd, finish, des, path, errFun)
     log("执行"+des);
     log(cmd);
     exec(cmd, {cwd:path}, function(err, stdout, stderr){
+        // console.log(iconv.decode(new Buffer(stdout, binaryEncoding), encoding), iconv.decode(new Buffer(stderr, binaryEncoding), encoding));
+        // stdout = iconv.decode(new Buffer(stdout, binaryEncoding), encoding);
+        // stderr = iconv.decode(new Buffer(stderr, binaryEncoding), encoding);
+        // if(stdout)
+        // {
+        //     let a  = iconv.encode(stdout, 'gb2312');
+        //     let c = iconv.decode(Buffer.from(stdout), "cp936")
+        //     let b = encoding.convert(stdout, 'gbk')
+        // }
         if(err)
         {
             log(err.message);
@@ -268,6 +345,16 @@ function cmdOper(cmd, finish, des, path, errFun)
             log("<font color='#ff0000'>发布失败，发布结束</font>")
             msgAlert("发布失败，发布结束");
         }else if(stderr){
+            
+            if(stderr.indexOf("Buffer() is deprecated due")!=-1)//不知道什么原因突然出现这个错误，先暂时处理下， 不影响功能
+            {
+                
+                log("忽略错误： "+stderr)
+                log(stdout);
+                log(des+"完成");
+                finish(stdout);
+                return;
+            }
             log(stderr)
             if(errFun)errFun(stderr);
             log("<font color='#ff0000'>"+des+"错误：</font>");
@@ -434,7 +521,17 @@ function run(config, data)
     
     userip = config.user;
     isrun = true;
-    doSvnUpdate();
+    let step = data.step;//step 0 一键发布   1更新  2编译   3提交svn
+    if(step == 1)// 1更新
+    {
+        doSvnUpdate(false);
+    }else if(step == 2){// 2编译
+        doPublish(false);
+    }else if(step == 3){//3提交svn
+        doSvnCommit(false);
+    }else{//默认一键发布
+        doSvnUpdate(true);
+    }
     return true;
 }
 
