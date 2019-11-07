@@ -1,6 +1,6 @@
 {
 	"name": "autocodeeui",
-	"description": "exml生成对应的代码模块【传奇来了项目组】",
+	"description": "exml生成对应的代码模块【女神项目组】",
 	"version": "1.0.0",
 	"publisher": "cyj",
 	"categories": [
@@ -8,12 +8,12 @@
 	],
 	"icon": "images/icon.svg",
 	"bugs": {
-		"url": "https://github.com/egret-labs/wing-extensions/issues"
+		"url": "https://github.com/chengyoujie/myProgramWay/issues"
 	},
-	"homepage": "https://github.com/egret-labs/wing-extensions/blob/master/README.md",
+	"homepage": "https://github.com/chengyoujie/myProgramWay/tree/master/egret/plugin/autoCodeEui/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/egret-labs/wing-extensions.git"
+		"url": "https://github.com/chengyoujie/myProgramWay.git"
 	},
 	"license": "MIT",
 	"activationEvents": [

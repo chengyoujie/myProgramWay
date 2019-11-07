@@ -13,8 +13,10 @@ namespace chm {
 
         /**界面打开**/
         public onOpen() {
-            
+            ${initEvent}
         }
+
+        ${eventFunction}
 
         /**界面销毁**/
         public destroy(): void {

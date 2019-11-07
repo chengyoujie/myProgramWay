@@ -64,6 +64,9 @@ function createCode(info:EUIInfo)
     let interfaceIds = "";
     let ids = info.ids;
     let createIdDic:{[id:number]:boolean} = {};
+    let initEvent = "";
+    let initButtons = [];
+    let eventFunction = "";
     for(let i=0; i<ids.length; i++)
     {
         let id = ids[i];
@@ -71,8 +74,23 @@ function createCode(info:EUIInfo)
         if(createIdDic[id.name])preAdd = "//";
         varids += preAdd+"public "+id.name+":"+id.module+id.clsName+";\n\t\t";
         interfaceIds += preAdd+id.name+"?:any;\n\t\t";
+        if(id.clsName == "Button")
+        {
+            initButtons .push(id.name);
+            let idUpName = id.name.replace("btn", "").replace("_", "");
+            if(!idUpName)idUpName = id.name;
+            idUpName = idUpName.charAt(0).toLocaleUpperCase()+idUpName.substr(1);
+            initEvent += "\n\t\t\t"+id.name+".clk(s.handleClk"+idUpName+", s)";
+            eventFunction += "\n\t\t/**"+id.name+"点击事件处理**/\n\t\tprivate handleClk"+idUpName+"(){\n\t\t\n\t\t}\n\t\t";
+        }
+
         createIdDic[id.name] = true;
     }
+    if(initButtons.length>0)
+        initEvent = "let s = this;\n\t\t\tlet {"+initButtons.join(",")+"} = s;"+initEvent;
+    varsDic['initEvent'] = initEvent;
+    varsDic['eventFunction'] = eventFunction;
+    
     varsDic['varids'] = varids;
     varsDic['interfaceIds'] = interfaceIds;
 
@@ -198,13 +216,24 @@ function createFileByModuld(modinfo:ModuleInfo, info:EUIInfo, varsDic:Object)
     // var outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
     let keyReg = /\[(.*?)\]/gi;
     let keyArr = keyReg.exec(modinfo.outdir);
-    let outpath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir+"/"+varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    let outpath;
+    ////***兼容老的目录结构 */
+    let outDirPath = path.join(rootpath,moduleCodePath+info.parentDir+"/"+modinfo.outdir);
+    let oldPath = path.join(outDirPath, "view")
+    if(fs.existsSync(oldPath))
+    {
+        outpath = path.join(oldPath, varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    }else{
+        outpath = path.join(outDirPath, varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
+    }
+    ///////end
     if(keyArr)
     {
         let outdir = modinfo.outdir.replace(keyArr[0], keyArr[1]).trim();
         outdir = outdir.replace("$floder", info.parentDir)
         outpath = path.join(rootpath, outdir, varsDic["shortName"]+modinfo.name+"."+modinfo.fileType);
     }
+    
     let exists = fs.existsSync(outpath);
     if(!modinfo.override && exists)
     {
