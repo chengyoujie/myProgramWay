@@ -73,8 +73,8 @@ function createCode(info:EUIInfo)
         let preAdd = "";
         if(createIdDic[id.name])preAdd = "//";
         varids += preAdd+"public "+id.name+":"+id.module+id.clsName+";\n\t\t";
-        interfaceIds += preAdd+id.name+"?:any;\n\t\t";
-        if(id.clsName == "Button")
+        interfaceIds += preAdd+id.name+":"+id.module+id.clsName+";\n\t\t";
+        if(id.name.indexOf("btn") == 0)
         {
             initButtons .push(id.name);
             let idUpName = id.name.replace("btn", "").replace("_", "");

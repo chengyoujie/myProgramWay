@@ -1,17 +1,11 @@
-namespace chm {
+declare namespace chm {
     /**
      * AutoCodeEui 生成的界面 
      * euiPath:${path} 
      * made by ${auth}
      * create on ${time} 
     */
-    export class ${shortName}UI extends Component {
-
-        ${varids}
-        
-        constructor(opt: ShowOptions){
-            super(opt);
-            this.skinName = '${skinName}';
-        }
+    export interface ${shortName}View {
+        ${interfaceIds}
     }
 }

@@ -1,16 +1,13 @@
-namespace chm {
+declare namespace chm {
     /**
      * AutoCodeEui 生成的界面 
      * euiPath:${path} 
      * made by ${auth}
      * create on ${time} 
     */
-    export class ${shortName}RenderUI extends BaseRender {
+    export interface ${shortName}Render {
     
-        ${varids}
+        ${interfaceIds}
         
-        constructor() {
-            super();
-        }
     }
 }

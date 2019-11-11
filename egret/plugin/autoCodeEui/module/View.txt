@@ -5,10 +5,11 @@ namespace chm {
      * made by ${auth}
      * create on ${time} 
     */
-    export class ${shortName}View extends ${shortName}UI {
+    export class ${shortName}View extends Component {
 
         constructor(opt: ShowOptions){
             super(opt);
+            this.skinName = '${skinName}';
         }
 
         /**界面打开**/

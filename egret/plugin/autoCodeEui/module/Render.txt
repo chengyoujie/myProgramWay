@@ -5,7 +5,7 @@ namespace chm {
      * made by ${auth}
      * create on ${time} 
     */
-    export class ${shortName}Render extends ${shortName}RenderUI {
+    export class ${shortName}Render extends BaseRender {
     
         constructor() {
             super();
