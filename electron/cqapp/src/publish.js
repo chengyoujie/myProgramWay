@@ -37,69 +37,83 @@ function doSvnUpdate(runNext)
         log("更新失败, 没有项目数据")
         return;
     }
-    cmdOper("svn update "+publishpath, function(stdout){
-        let cofReg = /C\s+(.*?)\s*[\r\n]/g;
-        let cofArr = cofReg.exec(stdout);
-        if(cofArr)//冲突处理
-        {
-            log("检测到有冲突文件");
-            while(cofArr)
-            {
-                log("<font color='#ff0000'>冲突文件： "+cofArr[1]+"</font>");
-                cofArr = cofReg.exec(stdout);
-            }
-            isrun = false;
-            log("<font color='#ff0000'>更新失败，Publish有冲突文件</font>");
-            msgAlert("<font color='#ff0000'>更新失败，Publish有冲突文件</font>");
+    svnUpdate(publishpath, function(stdout, isNotCof1){
+        if(!isNotCof1){
             return;
-        }
-        cmdOper("svn update "+rootpath, function(stdout){
-            let svnReg = /\s+revision\s+(\d+)\./gi;
-            let cofReg = /C\s+(.*?)\s*[\r\n]/g;
-            let cofArr = cofReg.exec(stdout);
-            if(cofArr)//冲突处理
-            {
-                /**
-                    C    D:\client2\newCode\yscq_test\resource\assets\module\main\MainTopSkin.exml
-                    Updated to revision 42163.
-                    Summary of conflicts:
-                    Text conflicts: 1
-                 */
-                log("检测到有冲突文件");
-                while(cofArr)
-                {
-                    log("<font color='#ff0000'>冲突文件： "+cofArr[1]+"</font>");
-                    cofArr = cofReg.exec(stdout);
+        }   
+        svnUpdate(rootpath+"/resource", function(stdout, isNotCof2){
+            if(!isNotCof2){
+                return;
+            }
+            svnUpdate(rootpath, function(stdout, isNotCof3){
+                if(!isNotCof3){
+                    return;
                 }
+                let svnReg = /\s+revision\s+(\d+)\./gi;
+                let svnArr = svnReg.exec(stdout);
+                if(svnArr)
+                {
+                    svnnum = svnArr[1];
+                }else{
+                    svnnum = 0;
+                }
+                log("当前代码svn版本号：<font color='#0000ff'>"+svnnum+"</font>");
+                //开始打包
+                if(runNext)
+                {
+                    doPublish(runNext);
+                }else{
+                    isrun = false;
+                    msgAlert("版本更新完毕svn版本号：<font color='#0000ff'>"+svnnum+"</font>")
+                }
+            });
+        });
+    })
+}
+
+function svnUpdate(dir, fun){
+    cmdOper("svn stat "+dir, function(stdout){
+        let statConf = checkConfilt(stdout);
+        if(statConf)
+        {
+            isrun = false;
+            log("<font color='#ff0000'>检测到有冲突文件</font>");
+            msgAlert("<font color='#ff0000'>检测到有冲突文件</font>");
+        }else{
+            cmdOper("svn update "+dir, function(stdout){
+            let isConfilt = checkConfilt(stdout);
+            if(isConfilt)
+            {
                 isrun = false;
                 log("<font color='#ff0000'>更新失败，有冲突文件</font>");
                 msgAlert("<font color='#ff0000'>更新失败，有冲突文件</font>");
-                return;
             }
-            let svnArr = svnReg.exec(stdout);
-            if(svnArr)
-            {
-                svnnum = svnArr[1];
-            }else{
-                svnnum = 0;
-            }
-            log("当前代码svn版本号：<font color='#0000ff'>"+svnnum+"</font>");
-            //开始打包
-            if(runNext)
-            {
-                doPublish(runNext);
-            }else{
-                isrun = false;
-                msgAlert("版本更新完毕svn版本号：<font color='#0000ff'>"+svnnum+"</font>")
-            }
-                
-        }, "更新项目代码")
+            if(fun)
+                fun(stdout, !isConfilt);
+            }, "更新 "+dir)
+        }
     },
-    "更新publish",
+    "检测state "+dir,
     undefined,
     function(errMsg){
         log("svn执行错误，请检查目录是否正确，或者尝试<a onclick='repaireSvn()' href='javascript:void(0);'>打开修复svn文件夹</a>")
-    })
+    });
+}
+
+function checkConfilt(stdout){
+    let cofReg = /C\s+(.*?)\s*[\r\n]/g;
+    let cofArr = cofReg.exec(stdout);
+    if(cofArr)//冲突处理
+    {
+        log("检测到有冲突文件");
+        while(cofArr)
+        {
+            log("<font color='#ff0000'>冲突文件： "+cofArr[1]+"</font>");
+            cofArr = cofReg.exec(stdout);
+        }
+        return true;
+    }
+    return false;
 }
 
 /**开始编译代码 */
@@ -188,9 +202,6 @@ function doSvnCommit()
 {
     // log("开始提交项目")
     cmdOper("svn stat "+publishpath, function(stdout){
-        // let addReg = /\?\s+(.*?)\s*[\r\n]/g;
-        // let modReg = /[MA]\s+(.*?)\s*[\r\n]/g;
-        // let remReg = /[\!D]\s+(.*?)\s*[\r\n]/g;
         let changeReg = /([\S])\s+(.*?)\s*[\r\n]/g;
         let addFiles = [];
         let modFiles = [];
@@ -226,7 +237,7 @@ function doSvnCommit()
         }
         if(confiltFiles.length>0)
         {
-            for(let i=9; i<confiltFiles.length; i++)
+            for(let i=0; i<confiltFiles.length; i++)
             {
                 log("<font color='#ff0000'>"+confiltFiles[i]+"</font>");
             }
@@ -235,40 +246,6 @@ function doSvnCommit()
             msgAlert("<font color='#ff0000'>发布失败，有冲突文件</font>");
             return;
         }
-        // for(let key in allFiles)
-        // {
-        //     let info = allFiles[key];
-        //     if(info.key == "?")
-        //         addFiles.push(tempArr[1]);
-        // }
-        // for(let key in allFiles)
-        // {
-        //     let info = allFiles[key];
-        //     if(info.key == "M" || info.key == "A")
-        //         modFiles.push(tempArr[1]);
-        // }
-        // for(let key in allFiles)
-        // {
-        //     let info = allFiles[key];
-        //     if(info.key == "!" || info.key == "D")
-        //         remFiles.push(tempArr[1]);
-        // }
-        // while(tempArr = modReg.exec(stdout))
-        // {
-        //     let finfo = path.parse(tempArr[1]);
-        //     let fname = finfo.name + finfo.ext;
-        //     if(projectData.svnIngnoreCommitFile.indexOf(fname) != -1)//config.zzp 不提交 由策划负责
-        //     {
-        //         continue;
-        //     }
-        //     modFiles.push(tempArr[1]);
-        //     allFiles.push(tempArr[1]);
-        // }
-        // while(tempArr = remReg.exec(stdout))
-        // {
-        //     remFiles.push(tempArr[1]);
-        //     allFiles.push(tempArr[1]);
-        // }
         if(addFiles.length > 0)
         {
             cmdOper("svn add "+addFiles.join(" "), (stdout)=>{
@@ -497,7 +474,7 @@ function run(config, data)
     }
     if(isrun)
     {
-        log("<font color='#ff0000'>当前正在编译中...."+ip+"</font>");
+        log("<font color='#ff0000'>当前正在编译中....</font>");
         return false;
     }
     rootpath = codepath;
