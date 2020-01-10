@@ -499,7 +499,9 @@ function run(ip)
     rootpath = codepath;
     publishpath = pubpath;
     log("发布【"+projectData.name+"】版本")
-    
+    if(ip == "172.18.1.54")ip = "磊哥"
+    else if(ip == "172.18.1.16")ip == "超哥"
+    else if(ip == "172.18.1.47")ip == "杰"
     userip = ip;
     isrun = true;
     doSvnUpdate(true);
