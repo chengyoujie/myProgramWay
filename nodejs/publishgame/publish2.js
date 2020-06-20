@@ -468,31 +468,23 @@ function repaireSvn()
 }
 
 var projectCfg;
-function oper(ip, operName, data)
+function oper(ip, operName, data)//{id, code, web, name}
 {
-    if(!projectCfg)
-    {
-        let appConfig = fs.readFileSync(path.join(__dirname, "app.config"), "utf-8");
-        projectCfg = JSON.parse(appConfig);
-       
+    projectData = {
+        "name":data.name,
+        "id":data.id,
+        "outFileName":["theme.js", "main.min.js", "configSetting.js"],
+        "ignoreFileName":["index.html", "gameEui.json"],
+        "svnIngnoreCommitFile":["bodyHeight.json"],
+        "codepath":data.code,
+        "pubpath":data.web,
+        "datapath":"D:/pubData"
     }
-    projectData = projectCfg.project[data.ver];
     console.log(projectData.id);
-    if(!projectData)
-    {
-        log("没有数据，请重新选择项目");
-        msgAlert("没有数据，请重新选择项目");
-        return;
-    }
-    
-    // if(!codepath)
+    // if(!projectData)
     // {
-    //     log("<font color='#ff0000'>当前代码路径为空</font>")
-    //     return;
-    // }
-    // if(!pubpath)
-    // {
-    //     log("<font color='#ff0000'>当前发布路径为空</font>")
+    //     log("没有数据，请重新选择项目");
+    //     msgAlert("没有数据，请重新选择项目");
     //     return;
     // }
     if(isrun)

@@ -10,18 +10,32 @@ var service = ws.createServer(function (con){
     let ipArr = ipReg.exec(ip);
     if(ipArr)ip = ipArr[0]
     let conins = con;
+	console.log("客户端链接成功");
     con.on("text", function(str){
-        console.log("recive"+ str);
-        let data = JSON.parse(str);
+        let data;
+        console.log("接受操作指令： "+str);
+        try{
+            data = JSON.parse(str);
+        }catch(e){
+            console.log("json解析错误： "+str);
+        }
+        if(!data)return;
+        log("开始操作"+data.oper+"  IP: <font color='#0940E8'>"+ip+"</font>");
         if(data.oper == "publish")
         {
             console.log("发版本了")   
-        }
-        log("开始发布版本  IP: <font color='#0940E8'>"+ip+"</font>");
-        let iscanrun = publish.run(ip);
-        if(!iscanrun)
-        {
-            log("正在执行发布中。。。");
+            let iscanrun = publish.oper(ip, data.oper, data);
+            if(!iscanrun)
+            {
+                log("正在执行发布中。。。");
+            }
+        }else if(data.oper == "copydata2web"){
+            console.log("开始拷贝了")
+            let iscanrun = publish.oper(ip, data.oper, data);
+            if(!iscanrun)
+            {
+                log("正在执行发布中。。。");
+            }
         }
     })
     con.on("close", function(code, reason){
