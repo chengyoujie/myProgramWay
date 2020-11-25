@@ -21,3 +21,9 @@ Zlib
 HttpRequest
 platform
 Window
+Component
+TabBar
+Direction
+EventType
+SilentLoad
+NetRsp

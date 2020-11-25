@@ -13,8 +13,8 @@ const WEBURL = "http://121.196.196.20/appdata/freeVideo_1/";//
 // const Menu = remote.Menu;
 // const MenuItem = remote.MenuItem;
 // var menu = new Menu();
-app.commandLine.appendSwitch('ppapi-flash-path',app.getPath('pepperFlashSystemPlugin'));
-app.commandLine.appendSwitch('ppapi-flash-version', '27.0.0.130');
+//app.commandLine.appendSwitch('ppapi-flash-path',app.getPath('pepperFlashSystemPlugin'));
+//app.commandLine.appendSwitch('ppapi-flash-version', '27.0.0.130');
 
 
 function createWindow()

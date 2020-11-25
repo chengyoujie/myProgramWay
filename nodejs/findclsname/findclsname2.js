@@ -1,15 +1,15 @@
 var fs = require("fs")
 var path = require("path");
 //项目根目录
-var root = "D:/client/newCode/yscq_test";
-var outpath = "";
+var root = path.normalize("D:/wxgame/code/nslm");
+var saveroot = path.normalize("D:/wxgame/code/mixgame");
 var subpath = "D:/client/newCode/yscq_test/pltSubPackMoudle";
 var curpath = __dirname;
 
 //项目的代码路径
 var srcpath = path.join(root, "src");
 //项目的exml路径
-var uipath = path.join(root, "resource/assets/module");
+var uipath = path.join(root, "resource/skin");
 //需要过滤的类
 let filterClsNames = getFileArr(path.join(curpath, "resource/filterclsname.txt"));
 //类名对应混淆后的类
@@ -30,6 +30,8 @@ let mixdic = {};
 let mix2clsdic = {};
 //已经读取的文件信息记录
 let lastfileinfo = {};
+
+var useCls = {};
 
 //=========开始执行混淆操作
 //读取本地存取的名对应的
@@ -60,9 +62,9 @@ function searchFile(dir, dealFile)
             searchFile(childfpath, dealFile);
         }else{
             let info = lastfileinfo[childfpath];
-            let timems = fs.statSync(childfpath).mtimeMs;//暂时先用上次修改时间做比较
-            if(~info && +info==timems)
-                continue;
+            let timems = fs.statSync(childfpath).mtimeMs;//先用上次修改时间做比较差异后续可以考虑使用crc32
+            // if(~info && +info==timems)//临时注释掉记录上次改变时间判断，所有的脚本都执行
+            //     continue;
             lastfileinfo[childfpath] = timems;
             dealFile(childfpath);
         }
@@ -90,6 +92,7 @@ function getClsName(filepath)
     var clsArr;
     while(clsArr = clsReg.exec(content)){
         let clsName = clsArr[1].trim();
+        useCls[clsName] = 0;
         if(filterClsNames.indexOf(clsName)==-1)
         {
             clsDic[clsName] = getMixName();
@@ -97,7 +100,57 @@ function getClsName(filepath)
             console.log(clsName+" -> "+clsDic[clsName])
         }
     }
+    let extendsReg = /\s+extends\s(\w+)/gi;
+    let extendsArr;
+    while(extendsArr = extendsReg.exec(content))
+    {
+        if(_hasExtendsCls.indexOf(extendsArr[1]) !=-1)continue;
+        _hasExtendsCls.push(extendsArr[1]);
+    }
+
     totalCount ++;
+}
+
+function getPrivMixName()
+{
+    let size = 0;
+    let minArrs;
+    let minArrs2;
+    return function(){
+        if(!minArrs)
+        {
+            minArrs = [];
+            minArrs2 = [];
+            for(let i='a'.charCodeAt(); i<="z".charCodeAt(); i++)
+            {
+                let char = String.fromCharCode(i);
+                if(char != 'x' && char != 'y')
+                    minArrs.push(char);
+                minArrs2.push(String.fromCharCode(i));
+            }
+            for(let i='A'.charCodeAt(); i<="Z".charCodeAt(); i++)
+            {
+                minArrs.push(String.fromCharCode(i));
+                minArrs2.push(String.fromCharCode(i));
+            }
+            for(let i='1'.charCodeAt(); i<="3".charCodeAt(); i++)
+            {
+                minArrs2.push(String.fromCharCode(i));
+            }
+        }
+        let index = size;
+        let maxlen = minArrs2.length;
+        let rect = minArrs[index%minArrs.length];
+        index = ~~(index/maxlen);
+        while(index != 0)
+        {
+            rect = minArrs[index % maxlen] + rect;
+            index = ~~(index/maxlen);
+        }
+        size++;
+        rect = ""+rect;
+        return rect;
+    }
 }
 
 function getMixName()
@@ -127,7 +180,7 @@ function getMixName()
         index = ~~(index/maxlen);
     } while(index != 0)
     curIndex++;
-    rect = "CH"+rect;
+    rect = "A"+rect;
     //todo check has in dic
     if(mix2clsdic[rect])//如果已经生成过的不在生成
     {
@@ -140,13 +193,44 @@ function replaceClsName(filepath, filtertype = "ts")
 {
     let content = getFileContent(filepath, filtertype);
     if(!content)return;
-    let savepath = filepath.replace("\\newCode", "");
+    let savepath = saveroot + filepath.replace(root, "");
     for(let key in clsDic)
     {
         // let reg = new RegExp("[\\s:;\\(\\)=<>\\.\\{\\}\'\"\`\\[\\],-\\|/\\*\\+\\-\\!\\~]("+key+")[\\s:;\\(\\)=<>\\.\\{\\}\'\"\`\\[\\],-\\|/\\*\\+\\-\\!\\~]", "g")
         let reg = new RegExp("[\\W]("+key+")[\\W]", "g")
         content = replace(reg, content, key);//content.replace(reg, (...args)=>{return args[0].replace(new RegExp(key, "g"), clsDic[key]);})
     }
+    let isExtends = false;
+    for(let i=0; i<_hasExtendsCls.length; i++)
+    {
+        if(filepath.indexOf(_hasExtendsCls[i]) != -1)
+        {
+            isExtends = true;
+            break;
+        }
+    }
+    // if(!isExtends){
+    //替换私有变量
+        // let ingoreKey = ["static","const","get","set","createShape","readonly",,"updateBox" ,"checkRed", "doScreenShow","dispose"]
+        // let prvReg = /private\s+(\w+)/gi;
+        // let prveArr;
+        // let minName = getPrivMixName();
+        // let minDic  = {};
+        // while(prveArr = prvReg.exec(content))
+        // {
+        //     let privar = prveArr[1].trim();
+        //     if(ingoreKey.indexOf(privar)!=-1)continue;
+        //     if(privar.indexOf("n_")==0)continue;
+        //     let replaceVar = minName();
+        //     minDic[privar] = replaceVar;
+            
+        // }
+        // for(let key in minDic)
+        // {
+        //     let reg = new RegExp("[\\W]("+key+")[\\W]", "g")
+        //     content = replace2(reg, content, key ,minDic[key]);
+        // }    
+    // }
     checkOrCreateDir(savepath);
     fs.writeFileSync(savepath, content);
     dealCount++;
@@ -156,7 +240,7 @@ function replaceUiName(filepath)
 {
     let content = getFileContent(filepath, "exml");
     if(!content)return;
-    let savepath = filepath.replace("\\newCode", "");
+    let savepath = saveroot + filepath.replace(root, "");
     for(let key in clsDic)
     {
         // let reg = new RegExp("[\\s:;\\(\\)=<>\\.\\{\\}\'\"\`\\[\\],-\\|/\\*\\+\\-\\!\\~]("+key+")[\\s:;\\(\\)=<>\\.\\{\\}\'\"\`\\[\\],-\\|/\\*\\+\\-\\!\\~]", "g")
@@ -177,6 +261,20 @@ function replace(reg, content, key)
     {
         // content.replace(reg, (...args)=>{return args[0].replace(new RegExp(key, "g"), clsDic[key]);})
         content = content.replace(arr[0], arr[0].replace(new RegExp(key, "g"), clsDic[key]))
+        reg.lastIndex = 0;
+    }
+    return content;
+}
+
+
+function replace2(reg, content, key, replaceKey)
+{
+    // content.replace(reg, (...args)=>{return args[0].replace(new RegExp(key, "g"), clsDic[key]);})
+    let arr;
+    while(arr = reg.exec(content))
+    {
+        // content.replace(reg, (...args)=>{return args[0].replace(new RegExp(key, "g"), clsDic[key]);})
+        content = content.replace(arr[0], arr[0].replace(new RegExp(key, "g"), replaceKey))
         reg.lastIndex = 0;
     }
     return content;
@@ -222,7 +320,7 @@ function getFileArr(path)
     for(let i=0; i<lines.length; i++)
     {
         if(!lines[i])continue;
-        rect.push(lines[i])
+        rect.push(lines[i].replace(/\r/gi, ""))
     }
     return rect;
 }
