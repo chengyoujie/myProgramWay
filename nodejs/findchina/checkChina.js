@@ -8,6 +8,8 @@ var lanTxt2Index = {};
 var maxLanIndex = 0;
 let lanObjPath = path.join("D:/workspace/trunk/nslm", "lanObj.json");
 var fileUrl = path.join(__dirname, "test.ts");
+var waitReplaceTxt = [];//需要替换的文本
+var fileContent = "";
 
 /**程序入口 */
 function run(){
@@ -44,7 +46,15 @@ const transformAST = function (context){
         let factory = ts.factory||ts;//兼容老版本3.0
         let createPropertyAccessExpression = ts.factory?ts.factory.createPropertyAccessExpression:ts.createPropertyAccess;
         let createCallExpression = ts.factory?ts.factory.createCallExpression:ts.createCall;
-        if(node.kind == ts.SyntaxKind.BinaryExpression)//表达式
+        if(node.kind == ts.SyntaxKind.CallExpression)//方法调用
+        {
+            if(node.expression.kind == ts.SyntaxKind.PropertyAccessExpression && node.expression.expression.text == "console")//对于console.xxx的不予处理
+            {
+                return node;
+            }else{
+                return ts.visitEachChild(node, searchNode, context);
+            }
+        }else if(node.kind == ts.SyntaxKind.BinaryExpression)//表达式
         {
             if(node.operatorToken && node.operatorToken.kind == ts.SyntaxKind.PlusToken)//A+B形式的
             {
@@ -54,6 +64,7 @@ const transformAST = function (context){
                 {
                     let lanStr = "";
                     let params = [];
+                    let paramStrs = [];
                     for(let i=0; i<nodes.length; i++)
                     {
                         let item = nodes[i];
@@ -62,6 +73,7 @@ const transformAST = function (context){
                             lanStr += item.text;
                         }else{
                             lanStr += "{"+params.length+"}";
+                            paramStrs.push(fileContent.substring(item.pos, item.end));
                             params.push(ts.visitEachChild(item, searchNode, context));
                         }
                     }
@@ -72,6 +84,7 @@ const transformAST = function (context){
                             factory.createIdentifier("k_"+lanIndex)
                         ),
                     )
+                    waitReplaceTxt.push({start:node.pos, end:node.end, txt:"StringUtil.substring(lanTxt.k_"+lanIndex+", "+paramStrs.join(",") +")"});
                     return createCallExpression(
                         createPropertyAccessExpression(
                             factory.createIdentifier("StringUtil"),
@@ -93,6 +106,7 @@ const transformAST = function (context){
             if(chinaReg.exec(node.text))
             {  
                 let lanIndex = getLanIndex(node.text);
+                waitReplaceTxt.push({start:node.pos, end:node.end, txt:"lanTxt.k_"+lanIndex});
                 return createPropertyAccessExpression(
                     factory.createIdentifier("lanTxt"),
                     factory.createIdentifier("k_"+lanIndex)
@@ -137,12 +151,26 @@ function isStringExpression(node, nodes){
 /**检测文件生成代码 */
 function checkFile(url)
 {
+    fileContent = fs.readFileSync(url, "utf-8");
     let progream = ts.createProgram([url], {});
     let sourceFile = progream.getSourceFile(url);
     let transform = ts.transform(sourceFile,[transformAST], {charset:"utf-8"})
-    const printer = ts.createPrinter();
-    let str = printer.printNode(ts.EmitHint.SourceFile, transform.transformed[0], sourceFile);
-    fs.writeFileSync(path.join(__dirname, "test2.ts"), str, "utf-8");
+    //使用ast生成的代码， 有可能会把格式改掉， 如颜色值0xFF0000改成十进制16711680， 所以暂时不使用
+    // const printer = ts.createPrinter();
+    // let str = printer.printNode(ts.EmitHint.SourceFile, transform.transformed[0], sourceFile);
+    // fs.writeFileSync(path.join(__dirname, "test2.ts"), str, "utf-8");
+    if(waitReplaceTxt.length>0)
+    {
+        let newContent = fileContent;
+        let indexChange = 0;
+        for(let i=0;i<waitReplaceTxt.length; i++)
+        {
+            let item = waitReplaceTxt[i];
+            newContent = newContent.substr(0, item.start+indexChange)+item.txt+newContent.substr(item.end+indexChange);
+            indexChange += item.txt.length-(item.end-item.start);
+        }
+        fs.writeFileSync(path.join(__dirname, "test2.ts"), newContent, "utf-8");
+    }
     console.log("代码转换完毕");
 }
 
