@@ -1,0 +1,62 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "description": "测试cyj",
+  "main": "src/index.js",
+  "dependencies": {
+    "greenworks": "file:greenworks"
+  },
+  "devDependencies": {
+    "electron": "^13.2.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "pack": "electron-builder"
+  },
+  "build": {
+    "appId": "com.cyj.app",
+    "asarUnpack": "**/greenworks/**",
+    "directories": {
+      "output": "out"
+    },
+    "asar": {
+      "smartUnpack": true
+    },
+    "extraResources": [
+      {
+        "from": "./steam_appid.txt",
+        "to": "./../steam_appid.txt",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico"
+    },
+    "win": {
+      "icon": "icon.ico",
+      "artifactName": "content.${ext}",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "mac": {
+      "icon": "icon.ico"
+    },
+    "files": [
+      "src/**/*",
+      "icon.ico",
+      "!**/*.sav"
+    ]
+  },
+  "author": "cyj",
+  "license": "ISC"
+}
