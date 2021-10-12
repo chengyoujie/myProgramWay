@@ -7,7 +7,7 @@
     "greenworks": "file:greenworks"
   },
   "devDependencies": {
-    "electron": "^13.2.3"
+    "electron": "^13.3.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
