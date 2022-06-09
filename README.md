@@ -15,6 +15,7 @@
 |----test       河南专技  获取课堂问答的答案
 |----webResThife 获取当前浏览网站所有的资源，并下载到本地
 |----cqapp自己写的工具集合，目前只有打包工具
+|----stream       Electon接入Stream的demo
 |
 |python Python相关的练习
 |----down_english_sound  下载pc.shuren100.com的声音文件  down_english_sound.py（网站已改版，用不了了）  down_sound.py为改版后资源下载代码
@@ -23,4 +24,7 @@
 |nodejs   NodeJs相关的练习
 |----findclsname  查找目录下的ts的类，并且混淆后拷贝到另一个目录下（也可用于程序压缩，混淆）
 |----publishgame  发布代码服务端  仿大神程方的处理方法
+|
+|cocos  Cocos 相关代码
+|
 ```
