@@ -1,1 +1,0 @@
-{"type":"View","props":{"width":377,"height":50},"compId":2,"child":[{"type":"Button","props":{"y":3,"x":234,"skin":"comp/button.png","label":"label"},"compId":3},{"type":"Text","props":{"y":7.5,"x":17.5,"width":171,"text":"测试文本","height":38,"fontSize":22,"color":"#ffffff","runtime":"Laya.Text"},"compId":4}],"loadList":["comp/button.png"],"loadList3D":[]}
