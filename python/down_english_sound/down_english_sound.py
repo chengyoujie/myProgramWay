@@ -12,7 +12,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 cookie = cookiejar.CookieJar();
 handler = request.HTTPCookieProcessor(cookie)
 opener = request.build_opener(handler)
-resopnse = opener.open("http://www.shuren100.com/Home/Hearing/index/p_id/2/t_id/10/p/1.html");
+resopnse = opener.open("http://old.shuren100.com/Home/Hearing/index/p_id/1/t_id/8.html");
 for item in cookie:
 	print("Name: " + item.name +"Value:"+ item.value)
 def loadpage(page, opener):
