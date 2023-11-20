@@ -41,10 +41,10 @@ def findimg(url):
         for link in ele.find_all("a",class_=["model-list-img"]):
             finddetail(link.attrs["href"])
 
-word = "卡通鱼"
+word = "海洋鱼"
 page = 4
 url = "https://search.cgmodel.com/model.html?field="+word+"&page="
-for i in range(1, 4):
-    print("开始查找 资源 "+word+"  第："+i+" 页")
-    newurl = url+i
+for i in range(1, 8):
+    print("开始查找 资源 "+word+"  第："+str(i)+" 页")
+    newurl = url+str(i)
     findimg(newurl)
