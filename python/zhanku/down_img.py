@@ -44,7 +44,7 @@ def findimg(url):
 #             print("http://old.shuren100.com"+link.attrs["href"], link.attrs["title"])
 #             down("http://old.shuren100.com"+link.attrs["href"], link.attrs["title"])
     
-findimg("https://www.zcool.com.cn/work/ZNTM0MjAwOTY=.html")
+# findimg("https://www.zcool.com.cn/work/ZNTM0MjAwOTY=.html")
 ##根据word来获取数据
 word = "捕鱼游戏场景"
 page = 4 #总共的页数
