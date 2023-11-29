@@ -19,7 +19,7 @@ def down(url):
     name = items[len(items)-1]
     try:
         print("下载："+link)
-        request.urlretrieve(link, "D:/testsound2/"+name)
+        request.urlretrieve(link, "D:/testsound/"+name)
     except:
         print("下载错误： "+link)
 #查找详细页的资源
@@ -32,19 +32,31 @@ def finddetail(url):
         for link in ele.find_all(name="li"):
             down("https:"+link.attrs["data-rel"])
 
-def findimg(url):
+def findimg(url, depthseach):
     response = requests.get(url, headers=headers)
     response.encoding = "utf8"
     html = response.text
     soup = BeautifulSoup(html, "html.parser", from_encoding="utf-8")
     for ele in soup.find_all(class_=["model-list-con"]): 
-        for link in ele.find_all("a",class_=["model-list-img"]):
-            finddetail(link.attrs["href"])
+        if (depthseach) :#下载详情页内的资源
+            for link in ele.find_all("a",class_=["model-list-img"]):
+                finddetail(link.attrs["href"])
+        else: #下载分页中展示的资源
+             for imgs in ele.find_all("img",class_=["w100", "notlazy"]):
+                down("https:"+imgs.attrs["data-src"])
+        
+       
+        
 
-word = "海洋鱼"
-page = 4
+       
+       
+
+word = "海草 珊瑚"
+page = 8
+#是否查找页面内的详细内容
+depthseach = False,#True
 url = "https://search.cgmodel.com/model.html?field="+word+"&page="
-for i in range(1, 8):
+for i in range(1, page):
     print("开始查找 资源 "+word+"  第："+str(i)+" 页")
     newurl = url+str(i)
-    findimg(newurl)
+    findimg(newurl, depthseach)
