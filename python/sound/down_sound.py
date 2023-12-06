@@ -23,20 +23,28 @@ headers2 = {
     }
 
 def down(url, dirname):
+    if len(url) == 0:
+        return
     result = url.split("?")
     link = result[0]
     items = link.split("/")
     name = items[len(items)-1]
+    dirname = dirname.replace(" ", "")
     outpath = "D:/testdownsound/"+dirname
     if os.path.exists(outpath) == False :
-        os.makedirs(outpath)
+        try:
+            os.makedirs(outpath)
+        except:
+            outpath = "D:/testdownsound/NotFound"
+            if os.path.exists(outpath) == False:
+                os.makedirs(outpath)
         print("创建文件夹： "+outpath)
     with open(f'{outpath}/{name}','wb') as file:
         try:
             r = requests.get(link,headers=headers)
             if r.status_code == 200:
                 file.write(r.content)
-                print(f'{name}  下载成功')
+                print(f'{dirname}/{name}  下载成功')
         except:
             print(f'Error：{name}  下载失败，请检查网络或请求网址是否正确')
     # try:
@@ -52,7 +60,10 @@ def findsound(url, dirname):
     # for ele in soup.find_all(class_="mejs-mediaelement"): 
     for sound in soup.find_all("audio"):
         print(sound.text)
-        down(sound.text, dirname)
+        try:
+            down(sound.text, dirname)
+        except:
+            print("下载 "+sound.text+" 错误")
 # resp=urllib.request.urlopen("http://172.18.2.61/nslm_new/web/")#下载
 # html=resp.read().decode("utf-8")
 # soup = BeautifulSoup(html, "html.parser", from_encoding="utf-8")
